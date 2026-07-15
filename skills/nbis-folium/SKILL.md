@@ -121,6 +121,9 @@ Create `AGENTS.md` in the project root with:
   `<dir>/`; default `report/`)
 - Reminder that R code chunks need `{r}` and require knitr/rmarkdown on the
   runner (the workflow installs these when `NEEDS_R` is `"true"`)
+- License note: this report is built from Roy Francis' folium templates and is
+  licensed **CC-BY-NC-SA 4.0** — attribute Roy Francis, no commercial use,
+  share-alike on derivatives
 
 ## Reference files
 

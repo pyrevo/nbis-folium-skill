@@ -139,22 +139,6 @@ Tell the user to enable GitHub Pages in the repo **Settings → Pages → Source
 "GitHub Actions"**. The first deployment happens automatically on push to
 `main`.
 
-### 8. Write AGENTS.md
-
-Create `AGENTS.md` in the project root with:
-
-- The project's NBIS ID, client, PI, analyst
-- Which folium template was chosen
-- Key file locations (`_quarto.yml` or `index.qmd`, `assets/`,
-  `.github/workflows/`)
-- Rendering command: `quarto render --output-dir <dir>` (output goes to
-  `<dir>/`; default `report/`)
-- Reminder that R code chunks need `{r}` and require knitr/rmarkdown on the
-  runner (the workflow installs these when `NEEDS_R` is `"true"`)
-- License note: this report is built from Roy Francis' folium templates and is
-  licensed **CC-BY-NC-SA 4.0** — attribute Roy Francis, no commercial use,
-  share-alike on derivatives
-
 ## Reference files
 
 ### templates/deploy-pages.yml

@@ -28,6 +28,8 @@ Pages deployment and proper NBIS branding.
 - **Which template**: `folium` (multi-page website) or `folium-webpage`
   (single self-contained HTML page)
 - **Project details**: NBIS ID, client, PI, analyst, project title
+- **Report output directory**: where the rendered report is written and uploaded
+  to GitHub Pages (default `report`). Examples: `report`, `docs`, `_site`.
 
 ### 2. Scaffold with Quarto
 
@@ -78,8 +80,11 @@ Create `.github/workflows/deploy-pages.yml` using the content from this skill's
 `templates/deploy-pages.yml` (also reproduced under "Reference files" below).
 This workflow renders the Quarto report and deploys it to GitHub Pages.
 
-The render uses `quarto render --output-dir report` so it works for **both**
-templates and uploads the resulting `report/` directory.
+The template uses the placeholder `__REPORT_DIR__` for the output directory.
+Replace it with the directory the user chose in step 1 (default `report`). It
+appears in two places: the render command (`quarto render --output-dir
+__REPORT_DIR__`) and the uploaded artifact path (`path: __REPORT_DIR__`).
+Using `--output-dir` makes the workflow work for **both** folium templates.
 
 ### 6. Fix standalone logo rendering
 
@@ -102,8 +107,8 @@ Create `AGENTS.md` in the project root with:
 - Which folium template was chosen
 - Key file locations (`_quarto.yml` or `index.qmd`, `assets/`,
   `.github/workflows/`)
-- Rendering command: `quarto render --output-dir report` (output goes to
-  `report/`)
+- Rendering command: `quarto render --output-dir <dir>` (output goes to
+  `<dir>/`; default `report/`)
 - Reminder that R code chunks need `{r}` and require knitr/rmarkdown on the
   runner
 
@@ -146,12 +151,12 @@ jobs:
         uses: quarto-dev/quarto-actions/setup@v2
 
       - name: Render report
-        run: quarto render --output-dir report
+        run: quarto render --output-dir __REPORT_DIR__
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: report
+          path: __REPORT_DIR__
 
   deploy:
     needs: build

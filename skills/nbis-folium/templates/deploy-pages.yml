@@ -32,12 +32,12 @@ jobs:
         uses: quarto-dev/quarto-actions/setup@v2
 
       - name: Render report
-        run: quarto render --output-dir report
+        run: quarto render --output-dir __REPORT_DIR__
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: report
+          path: __REPORT_DIR__
 
   deploy:
     needs: build

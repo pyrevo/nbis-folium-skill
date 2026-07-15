@@ -30,6 +30,9 @@ Pages deployment and proper NBIS branding.
 - **Project details**: NBIS ID, client, PI, analyst, project title
 - **Report output directory**: where the rendered report is written and uploaded
   to GitHub Pages (default `report`). Examples: `report`, `docs`, `_site`.
+- **R support**: does the report contain R code chunks (reading CSV, ggplot,
+  etc.)? Most NBIS reports do, so default **yes**. Choose **no** only for a
+  pure-Python or markdown report with no R. (Default: yes.)
 
 ### 2. Scaffold with Quarto
 
@@ -86,6 +89,12 @@ appears in two places: the render command (`quarto render --output-dir
 __REPORT_DIR__`) and the uploaded artifact path (`path: __REPORT_DIR__`).
 Using `--output-dir` makes the workflow work for **both** folium templates.
 
+The workflow also has an `NEEDS_R` environment variable (default `"true"`).
+If the user chose **no R support** in step 1, set it to `"false"` so the runner
+skips installing R — this is the normal case for pure-Python / markdown
+reports. NBIS reports that read CSV or run ggplot in `{r}` chunks must keep it
+`"true"`.
+
 ### 6. Fix standalone logo rendering
 
 Replace `assets/include_logo.html` with the version from this skill's
@@ -110,7 +119,7 @@ Create `AGENTS.md` in the project root with:
 - Rendering command: `quarto render --output-dir <dir>` (output goes to
   `<dir>/`; default `report/`)
 - Reminder that R code chunks need `{r}` and require knitr/rmarkdown on the
-  runner
+  runner (the workflow installs these when `NEEDS_R` is `"true"`)
 
 ## Reference files
 
@@ -136,13 +145,18 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Set to "false" for pure-Python / markdown reports that contain no R chunks.
+      NEEDS_R: "true"
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up R
+        if: ${{ env.NEEDS_R == 'true' }}
         uses: r-lib/actions/setup-r@v2
 
       - name: Install R packages
+        if: ${{ env.NEEDS_R == 'true' }}
         run: |
           install.packages(c("knitr", "rmarkdown"))
         shell: Rscript {0}

@@ -114,7 +114,10 @@ Claude Code, Codex, …) and as a plain self-contained prompt for simpler agents
 
 # License
 
-MIT — see the repository `LICENSE`.
+CC-BY-NC-SA 4.0 — see the repository `LICENSE`. This matches the license of the
+bundled report templates by Roy Francis. Attribution to Roy Francis is required,
+commercial use is not permitted, and derivatives must carry the same license
+(share-alike).
 
 ::: {.text-center}
 [View source on GitHub](https://github.com/pyrevo/nbis-folium-skill){.btn .btn-primary .btn-sm target="_blank"}

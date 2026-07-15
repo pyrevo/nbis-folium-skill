@@ -114,3 +114,7 @@ Claude Code, Codex, …) and as a plain self-contained prompt for simpler agents
 # License
 
 MIT — see the repository `LICENSE`.
+
+::: {.text-center}
+[View source on GitHub](https://github.com/pyrevo/nbis-folium-skill){.btn .btn-primary .btn-sm target="_blank"}
+:::

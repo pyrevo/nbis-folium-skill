@@ -23,6 +23,15 @@ Use this when starting a new NBIS bioinformatics project. It scaffolds a Quarto
 report repository using Roy Francis' folium template, with CI/CD for GitHub
 Pages deployment and proper NBIS branding.
 
+**Upstream templates (Roy Francis):** this skill wraps two open-source Quarto
+report templates. Browse them for reference, structure, and the latest version:
+- `folium` (multi-page website): <https://github.com/royfrancis/folium>
+- `folium-webpage` (single self-contained page): <https://github.com/royfrancis/folium-webpage>
+
+Both are released under CC-BY-NC-SA 4.0. This skill (and reports it scaffolds)
+keep the same license and must attribute Roy Francis. See the distribution
+repo's README for full credits.
+
 ## Requirements
 
 Before scaffolding, verify the toolchain is present. Run:
@@ -66,6 +75,9 @@ Quarto is available. (Git and network access are also required.)
   pure-Python or markdown report with no R. (Default: yes.)
 
 ### 2. Scaffold with Quarto
+
+These `quarto use template` commands pull Roy Francis' template repos from
+GitHub (see the "Upstream templates" note above for the browsable URLs):
 
 ```bash
 cd <project-directory>

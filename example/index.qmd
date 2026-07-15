@@ -1,9 +1,9 @@
 ---
-title: "nbis-folium-skill — live demo"
-subtitle: "What this skill scaffolds"
-description: "A demonstration report produced by the nbis-folium skill."
+title: "NBIS support {{< meta nbis.id >}}"
+subtitle: "nbis-folium-skill — live demo"
+description: "A live demonstration of the report produced by the nbis-folium skill."
 date: last-modified
-author: "NBIS"
+author: "{{< meta nbis.analyst.name >}}"
 nbis:
   id: "DEMO-000"
   client:
@@ -19,38 +19,77 @@ nbis:
 
 format:
   html:
-    theme: cosmo
+    quarto-required: ">=1.8.25"
+    theme: "assets/css/styles.scss"
+    include-in-header: "assets/include_head.html"
+    include-after-body: "assets/include_logo.html"
+    smooth-scroll: true
     toc: true
+    toc-depth: 5
+    toc-location: right
+    number-sections: true
+    number-depth: 4
+    code-fold: true
+    code-tools: false
+    code-copy: true
+    code-overflow: wrap
+    df-print: paged
+    fig-align: left
+    title-block-banner: "assets/banner.png"
+    date-format: "DD-MMM-YYYY"
+    standalone: true
     embed-resources: true
+
+crossref:
+  fig-title: "**Fig**"
+  fig-labels: arabic
+  tbl-title: "**Tab**"
+  tbl-labels: arabic
+  title-delim: "**:**"
+
+execute:
+  eval: true
+  echo: true
+  warning: false
+  message: false
+
+filters:
+  - assets/custom.lua
+  - collapse-output
+  - fontawesome
 ---
 
-# nbis-folium-skill
+# What this skill does
 
-This page is a **live demonstration** of what the `nbis-folium` skill produces.
-It was authored with the same Quarto folium tooling the skill sets up, and is
-published automatically to GitHub Pages by this repository's demo workflow.
+This page is a **live demonstration** of the report that the `nbis-folium`
+skill scaffolds. It is built from the same Roy Francis
+[folium-webpage](https://github.com/royfrancis/folium) Quarto template that the
+skill uses, so the NBIS branding, banner, logo, and section styling you see here
+are exactly what a real NBIS project report gets.
 
-## What the skill does
+The skill:
 
-The `nbis-folium` skill scaffolds an NBIS project report from Roy Francis'
-[folium](https://github.com/royfrancis/folium) Quarto template, with:
+- Scaffolds an NBIS project report from the `folium` (multi-page) or
+  `folium-webpage` (single self-contained page) Quarto template
+- Installs the required Quarto extensions (fontawesome, collapse-output)
+- Fills in the NBIS metadata (ID, client, PI, analyst, title)
+- Adds a GitHub Actions workflow that renders and publishes the report to
+  GitHub Pages
+- Embeds the NBIS logo as a base64 data URI so it renders correctly in
+  standalone HTML
+- Asks whether the report needs R support, and skips the R toolchain when not
 
-- GitHub Actions CI/CD for GitHub Pages deployment
-- NBIS branding (logo embedded as a data URI so it renders standalone)
-- A configurable report output directory (`__REPORT_DIR__`)
-- Optional R support (`NEEDS_R`), skipped for pure-Python / markdown reports
-
-## How to install
+# How to install
 
 ```bash
 npx skills add pyrevo/nbis-folium-skill
 ```
 
-Then ask your coding agent to start a new NBIS folium report. The agent will
-guide you through the template choice, project metadata, output directory, and
+Then ask your coding agent to start a new NBIS folium report. The agent guides
+you through the template choice, project metadata, output directory, and
 R-support questions.
 
-## Example scaffold layout
+# Example scaffold layout
 
 A report scaffolded by the skill looks like this:
 
@@ -66,12 +105,12 @@ project/
 └── AGENTS.md
 ```
 
-## Agent compatibility
+# Agent compatibility
 
 The skill works both as a native `skill` for agents that support one (OpenCode,
-Claude Code, Codex, …) and as a plain self-contained prompt for simpler agents —
-the template files are reproduced inline in `SKILL.md`.
+Claude Code, Codex, …) and as a plain self-contained prompt for simpler agents
+— the template files are reproduced inline in `SKILL.md`.
 
-## License
+# License
 
 MIT — see the repository `LICENSE`.

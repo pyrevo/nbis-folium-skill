@@ -1,6 +1,20 @@
 ---
 name: nbis-folium
-description: Scaffold a new NBIS project report using the folium or folium-webpage Quarto template with GitHub Actions CI/CD and GitHub Pages deployment
+description: >-
+  Scaffold a new NBIS (National Bioinformatics Infrastructure Sweden) project
+  report using Roy Francis' folium or folium-webpage Quarto template, with
+  GitHub Actions CI/CD and GitHub Pages deployment wired up. Use this skill
+  whenever the user wants to start a new NBIS report, mentions folium /
+  folium-webpage, asks to publish a Quarto report to GitHub Pages, or needs an
+  NBIS-branded analysis/delivery report — even if they don't explicitly say
+  "use the nbis-folium skill".
+compatibility: >-
+  Requires `quarto` (>= 1.8.25), `git`, and a GitHub account with Pages
+  enabled. The agent must be able to run shell commands and have network
+  access. The final render + deploy runs on GitHub Actions, but Quarto must be
+  installed locally to scaffold the project (it pulls the template repo and
+  installs extensions). R is optional — only needed if the report uses `{r}`
+  chunks.
 ---
 
 # nbis-folium
@@ -8,6 +22,23 @@ description: Scaffold a new NBIS project report using the folium or folium-webpa
 Use this when starting a new NBIS bioinformatics project. It scaffolds a Quarto
 report repository using Roy Francis' folium template, with CI/CD for GitHub
 Pages deployment and proper NBIS branding.
+
+## Requirements
+
+Before scaffolding, verify the toolchain is present. Run:
+
+```bash
+quarto --version   # must be >= 1.8.25
+git --version
+```
+
+If `quarto` is **not found**, stop and tell the user to install it first:
+<https://quarto.org/docs/get-started/> (or `brew install quarto` / `conda
+install -c conda-forge quarto`). Do not try to hand-write the template files —
+`quarto use template` and `quarto add` pull Roy's template repo, SCSS,
+`_extensions/`, `assets/` and install the required extensions, which cannot be
+reproduced reliably by writing a `.qmd` by hand. The agent can proceed once
+Quarto is available. (Git and network access are also required.)
 
 ## Agent compatibility
 

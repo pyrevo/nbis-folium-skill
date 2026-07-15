@@ -63,12 +63,15 @@ created by **Roy Francis**:
   single self-contained page template
 
 The skill would not exist without his work. The report templates themselves are
-released under **CC-BY-NC-SA** (see the `LICENSE` in each template repo); this
-distribution repo (the skill packaging) is released under MIT, as noted below.
+released under **CC-BY-NC-SA** (see the `LICENSE` in each template repo). To
+keep the licensing consistent end-to-end, this distribution repo (the skill
+packaging) is released under the same **CC-BY-NC-SA 4.0** license.
 
 Built using [Quarto](https://quarto.org/).
 
 ## License
 
-MIT — see [LICENSE](LICENSE). (The bundled report templates are CC-BY-NC-SA;
-attribution to Roy Francis is requested when reusing them.)
+CC-BY-NC-SA 4.0 — see [LICENSE](LICENSE). This matches the license of the
+bundled report templates by Roy Francis. Attribution to Roy Francis is
+required, commercial use is not permitted, and derivatives must carry the same
+license (share-alike).

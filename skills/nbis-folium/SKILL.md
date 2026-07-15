@@ -109,18 +109,9 @@ nbis:
 Also set `title` / `subtitle` in `index.qmd` (webpage) or the site title in
 `_quarto.yml` (multi-page) to the project title.
 
-### Completion section (already included — do NOT add)
-
-Both templates already ship the Completion section (Data responsibility +
-Acknowledgments):
-- **folium-webpage**: it is inline at the end of the template's `index.qmd`
-  (as `### Data responsibility` / `### Acknowledgments` headings).
-- **folium** (multi-page): it ships as a standalone `completion.qmd` chapter
-  listed in `_quarto.yml` nav.
-
-So do **not** add a Completion section yourself — doing so would duplicate it.
-(This skill used to carry a `templates/completion.qmd` for this, but it is
-redundant with the templates, so it was removed.)
+Note: both templates already include the Completion section (Data responsibility
++ Acknowledgments) — inline at the end of `index.qmd` for folium-webpage, and as
+a `completion.qmd` chapter in `_quarto.yml` nav for folium. No action needed.
 
 ### 5. Add CI/CD for GitHub Pages
 

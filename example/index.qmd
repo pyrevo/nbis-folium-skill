@@ -1,0 +1,77 @@
+---
+title: "nbis-folium-skill — live demo"
+subtitle: "What this skill scaffolds"
+description: "A demonstration report produced by the nbis-folium skill."
+date: last-modified
+author: "NBIS"
+nbis:
+  id: "DEMO-000"
+  client:
+    name: "Demo Client"
+    email: "client@demo.se"
+    org: "Demo Organisation"
+  pi:
+    name: "Demo PI"
+    email: "pi@demo.se"
+  analyst:
+    name: "NBIS Analyst"
+    email: "analyst@nbis.se"
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    embed-resources: true
+---
+
+# nbis-folium-skill
+
+This page is a **live demonstration** of what the `nbis-folium` skill produces.
+It was authored with the same Quarto folium tooling the skill sets up, and is
+published automatically to GitHub Pages by this repository's demo workflow.
+
+## What the skill does
+
+The `nbis-folium` skill scaffolds an NBIS project report from Roy Francis'
+[folium](https://github.com/royfrancis/folium) Quarto template, with:
+
+- GitHub Actions CI/CD for GitHub Pages deployment
+- NBIS branding (logo embedded as a data URI so it renders standalone)
+- A configurable report output directory (`__REPORT_DIR__`)
+- Optional R support (`NEEDS_R`), skipped for pure-Python / markdown reports
+
+## How to install
+
+```bash
+npx skills add pyrevo/nbis-folium-skill
+```
+
+Then ask your coding agent to start a new NBIS folium report. The agent will
+guide you through the template choice, project metadata, output directory, and
+R-support questions.
+
+## Example scaffold layout
+
+A report scaffolded by the skill looks like this:
+
+```
+project/
+├── _quarto.yml          # (folium multi-page) or index.qmd (webpage)
+├── assets/
+│   ├── include_logo.html
+│   └── ...
+├── .github/
+│   └── workflows/
+│       └── deploy-pages.yml
+└── AGENTS.md
+```
+
+## Agent compatibility
+
+The skill works both as a native `skill` for agents that support one (OpenCode,
+Claude Code, Codex, …) and as a plain self-contained prompt for simpler agents —
+the template files are reproduced inline in `SKILL.md`.
+
+## License
+
+MIT — see the repository `LICENSE`.

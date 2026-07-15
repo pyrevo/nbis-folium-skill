@@ -1,0 +1,49 @@
+name: Deploy demo site to GitHub Pages
+
+# Only runs when the demo content changes, so it never triggers on
+# skill-distribution commits. Does NOT affect `npx skills add` (that only
+# packages the skills/ directory).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "example/**"
+      - ".github/workflows/demo-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: demo-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Render demo report
+        run: quarto render example/index.qmd --output-dir ../demo
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: demo
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

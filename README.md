@@ -2,7 +2,10 @@
 
 A skill for coding agents that scaffolds an [NBIS](https://nbis.se) project
 report using Roy Francis' [folium](https://github.com/royfrancis/folium)
-Quarto template, with GitHub Pages publishing wired up automatically.
+(multi-page website) and
+[folium-webpage](https://github.com/royfrancis/folium-webpage)
+(single self-contained page) Quarto templates, with GitHub Pages publishing
+wired up automatically.
 
 The skill asks which report style you want, fills in the project metadata, and
 sets up everything needed to publish the report to GitHub Pages with one push.
@@ -49,6 +52,23 @@ If your agent doesn't support the install command, copy the folder
 Publishing uses GitHub Pages, so the project must live in a GitHub repository
 and Pages must be enabled (Settings → Pages → Source: "GitHub Actions").
 
+## Credits & acknowledgements
+
+This skill is a packaging/wrapper around the excellent NBIS report templates
+created by **Roy Francis**:
+
+- [royfrancis/folium](https://github.com/royfrancis/folium) — multi-page
+  website template
+- [royfrancis/folium-webpage](https://github.com/royfrancis/folium-webpage) —
+  single self-contained page template
+
+The skill would not exist without his work. The report templates themselves are
+released under **CC-BY-NC-SA** (see the `LICENSE` in each template repo); this
+distribution repo (the skill packaging) is released under MIT, as noted below.
+
+Built using [Quarto](https://quarto.org/).
+
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE). (The bundled report templates are CC-BY-NC-SA;
+attribution to Roy Francis is requested when reusing them.)

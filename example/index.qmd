@@ -57,6 +57,7 @@ filters:
   - assets/custom.lua
   - collapse-output
   - fontawesome
+  - accordion
 ---
 
 # What this skill does

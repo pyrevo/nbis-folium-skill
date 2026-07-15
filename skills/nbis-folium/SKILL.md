@@ -48,6 +48,7 @@ quarto use template royfrancis/folium-webpage # single self-contained page
 ```bash
 quarto add quarto-ext/fontawesome
 quarto add mcanouil/quarto-collapse-output@1.4.0
+quarto add royfrancis/quarto-accordion
 ```
 
 ### 4. Customise project metadata

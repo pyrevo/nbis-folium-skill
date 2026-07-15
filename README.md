@@ -7,6 +7,10 @@ Quarto template, with GitHub Pages publishing wired up automatically.
 The skill asks which report style you want, fills in the project metadata, and
 sets up everything needed to publish the report to GitHub Pages with one push.
 
+A live demo of the generated report (built from the real folium-webpage
+template, with full NBIS branding) is published here:
+<https://pyrevo.github.io/nbis-folium-skill/>
+
 ## What it does
 
 - Scaffolds a new report repo from the `folium` (multi-page) or

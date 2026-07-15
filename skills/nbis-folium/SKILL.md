@@ -49,6 +49,28 @@ install -c conda-forge quarto`). Do not try to hand-write the template files —
 reproduced reliably by writing a `.qmd` by hand. The agent can proceed once
 Quarto is available. (Git and network access are also required.)
 
+**Install scope (for local testing before GitHub Actions):** the scaffold and
+the local `quarto render` only need Quarto on the machine — it does **not** have
+to be inside the project. Choose one:
+- **Globally** (recommended for simplicity): install Quarto system-wide as above
+  (`brew install quarto`, the official installer, or `conda install -c
+  conda-forge quarto`). Then run `quarto render` from the project directory.
+- **Locally / in an isolated environment**: if the user prefers isolation (e.g.
+  to match the CI runner or avoid touching system packages), put Quarto in a
+  `conda` env (`conda create -n nbis python=3.12 && conda install -c
+  conda-forge quarto -n nbis`, then `conda activate nbis`). Alternatively
+  download the standalone Quarto binary and add it to `PATH` for just that
+  shell. Activate/open that environment before running `quarto render` so the
+  local test mirrors the Actions runner. (Note: Quarto is **not** a PyPI
+  package, so it cannot be `pip install`ed into a Python venv — use conda or the
+  standalone binary.)
+
+Either way, the final **render + deploy runs on GitHub Actions** (the workflow
+installs Quarto itself via `quarto-dev/quarto-actions/setup@v2`), so a local
+install is only for the user to preview the report before pushing — it is
+optional. R is only needed locally if the report uses `{r}` chunks (the workflow
+installs R automatically when `NEEDS_R` is `true`).
+
 ## Agent compatibility
 
 - **Agents with a `skill` tool** (e.g. OpenCode, Claude Code / Codex with skills

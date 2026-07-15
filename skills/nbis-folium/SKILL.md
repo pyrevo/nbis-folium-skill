@@ -99,9 +99,23 @@ reports. NBIS reports that read CSV or run ggplot in `{r}` chunks must keep it
 ### 6. Fix standalone logo rendering
 
 Replace `assets/include_logo.html` with the version from this skill's
-`templates/include_logo.html` (reproduced under "Reference files" below). It
-embeds the NBIS logo as a base64 data URI so the logo renders correctly even in
-standalone HTML output.
+`templates/include_logo.html` (reproduced under "Reference files" below).
+
+**Why this matters (gotcha):** the NBIS SciLifeLab logo must be **inlined as
+SVG markup** in `include_logo.html`. Do NOT reference it as an external file
+(`assets/logos/nbis-scilifelab.svg`) and do NOT use a base64 data URI:
+
+- An external `src` breaks on deploy: `quarto render` with `embed-resources:
+  true` only copies/inlines files that are *statically* referenced. The logo
+  `<img>` is created by JavaScript at runtime, so Quarto never sees it and the
+  file is absent from the published site → broken-image icon. (Roy's own
+  template uses a file path, but that only works because his site is served
+  with the assets folder present; a scaffolded/deployed report is not.)
+- A base64 data URI of the viewBox-only SVG renders as a black box in several
+  browsers.
+
+The inlined-SVG approach renders everywhere with no external dependency. Copy
+the file verbatim — the SVG is long, do not retype it.
 
 ### 7. Inform the user
 
@@ -190,7 +204,8 @@ jobs:
 
 ### templates/include_logo.html
 
-The file embeds the NBIS logo as a base64 data URI. Copy the full content from
-this skill's `templates/include_logo.html` into
-`<project>/assets/include_logo.html`. (The data URI is long; do not retype it —
-copy the file verbatim.)
+Inlines the NBIS SciLifeLab logo as SVG markup (no external `src`, no data
+URI) so it renders correctly in the deployed/standalone report. Copy the full
+content from this skill's `templates/include_logo.html` into
+`<project>/assets/include_logo.html`. (The SVG is long; do not retype it — copy
+the file verbatim. See step 6 for why an external file or data URI fails.)

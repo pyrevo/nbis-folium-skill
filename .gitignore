@@ -220,3 +220,6 @@ __marimo__/
 # NBIS project brief (local only — kept in git history, retrievable via:
 #   git show db2d438:AGENTS.md   or the GitHub commit view for that SHA)
 AGENTS.md
+
+# Demo site build output (rendered by .github/workflows/demo-pages.yml)
+/demo/

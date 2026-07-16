@@ -64,7 +64,7 @@ filters:
 
 This page is a **live demonstration** of the report that the `nbis-folium`
 skill scaffolds. It is built from the same Roy Francis
-[folium-webpage](https://github.com/royfrancis/folium) Quarto template that the
+[folium-webpage](https://github.com/royfrancis/folium-webpage) Quarto template that the
 skill uses, so the NBIS branding, banner, logo, and section styling you see here
 are exactly what a real NBIS project report gets.
 
@@ -72,12 +72,12 @@ The skill:
 
 - Scaffolds an NBIS project report from the `folium` (multi-page) or
   `folium-webpage` (single self-contained page) Quarto template
-- Installs the required Quarto extensions (fontawesome, collapse-output)
+- Installs the required Quarto extensions (fontawesome, collapse-output, accordion)
 - Fills in the NBIS metadata (ID, client, PI, analyst, title)
 - Adds a GitHub Actions workflow that renders and publishes the report to
   GitHub Pages
-- Embeds the NBIS logo as a base64 data URI so it renders correctly in
-  standalone HTML
+- Inlines the NBIS SciLifeLab logo as SVG markup (no external asset dependency)
+  so it renders correctly in standalone HTML
 - Asks whether the report needs R support, and skips the R toolchain when not
 
 # How to install

@@ -2,12 +2,14 @@
 name: nbis-folium
 description: >-
   Scaffold a new NBIS (National Bioinformatics Infrastructure Sweden) project
-  report using Roy Francis' folium or folium-webpage Quarto template, with
-  GitHub Actions CI/CD and GitHub Pages deployment wired up. Use this skill
-  whenever the user wants to start a new NBIS report, mentions folium /
-  folium-webpage, asks to publish a Quarto report to GitHub Pages, or needs an
-  NBIS-branded analysis/delivery report — even if they don't explicitly say
-  "use the nbis-folium skill".
+  report using Roy Francis' folium or folium-webpage Quarto report templates,
+  with GitHub Actions CI/CD and GitHub Pages deployment wired up. Use this
+  skill whenever the user wants to start a new NBIS report, mentions
+  folium / folium-webpage Quarto templates, asks to publish a Quarto report to
+  GitHub Pages, or needs an NBIS-branded analysis/delivery report. This skill
+  is ONLY for Roy Francis' NBIS Quarto report templates — do NOT use it for the
+  Python `folium` geospatial/mapping library, Leaflet maps, marker clusters, or
+  general GIS visualization.
 compatibility: >-
   Requires `quarto` (>= 1.8.25), `git`, and a GitHub account with Pages
   enabled. The agent must be able to run shell commands and have network

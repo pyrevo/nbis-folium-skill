@@ -223,3 +223,4 @@ AGENTS.md
 
 # Demo site build output (rendered by .github/workflows/demo-pages.yml)
 /demo/
+/docs/

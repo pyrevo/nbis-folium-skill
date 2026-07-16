@@ -1,0 +1,31 @@
+---
+title: Example report
+subtitle: "NBIS support {{< meta nbis.id >}}"
+description: "A minimal report section in the multi-page nbis-folium demo."
+code-tools: true
+---
+
+::: {.callout-note collapse="true"}
+
+## Versions
+
+**29-Mar-2025**  
+
+- First version
+
+:::
+
+## About this demo
+
+This small report section demonstrates the sidebar navigation, page layout,
+and shared NBIS branding of the `folium` multi-page template.
+
+## What the skill configures
+
+- project metadata;
+- the GitHub Pages workflow;
+- required Quarto extensions;
+- reproducible R and Python dependency handling when code is enabled.
+
+The source fixture is pinned in this repository so this demo can be rendered
+reproducibly, independent of upstream template changes.

@@ -13,12 +13,15 @@ skill_dir="$repo_root/skills/nbis-folium"
 workflow="$skill_dir/templates/deploy-pages.yml"
 logo="$skill_dir/templates/include_logo.html"
 example="$repo_root/example"
+multi_example="$repo_root/example-folium"
 
 test -f "$skill_dir/SKILL.md"
 test -f "$workflow"
 test -f "$logo"
 test -f "$skill_dir/references/compatibility.md"
 test -f "$skill_dir/references/licensing.md"
+test -f "$multi_example/_quarto.yml"
+test -f "$multi_example/assets/logos/nbis-scilifelab.webp"
 
 grep -Fq 'Python `folium`' "$skill_dir/SKILL.md"
 grep -Fq 'requires an agent that can read the installed skill directory' "$skill_dir/SKILL.md"
@@ -45,7 +48,12 @@ if [ "$skip_render" = false ] && command -v quarto >/dev/null 2>&1; then
   (cd "$example" && quarto render index.qmd --output-dir "$output_dir")
   test -f "$output_dir/index.html"
   grep -Fq '<svg' "$output_dir/index.html"
-  echo "Validation passed; example rendered with Quarto."
+  multi_output_dir="$tmp_dir/folium"
+  (cd "$multi_example" && quarto render --output-dir "$multi_output_dir")
+  test -f "$multi_output_dir/index.html"
+  test -f "$multi_output_dir/assets/logos/nbis-scilifelab.webp"
+  grep -R -Fq 'assets/logos/nbis-scilifelab.webp' "$multi_output_dir"
+  echo "Validation passed; both demo fixtures rendered with Quarto."
 else
   echo "Static validation passed; Quarto render skipped."
 fi

@@ -8,6 +8,7 @@ on:
     branches: [main]
     paths:
       - "example/**"
+      - "example-folium/**"
       - ".github/workflows/demo-pages.yml"
   workflow_dispatch:
 
@@ -34,6 +35,9 @@ jobs:
 
       - name: Render demo report
         run: quarto render example/index.qmd --output-dir ../demo
+
+      - name: Render multi-page demo
+        run: quarto render example-folium --output-dir ../demo/folium
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -1,0 +1,87 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  open-graph: true
+  site-url: "https://pyrevo.github.io/nbis-folium-skill/folium/"
+  image: "assets/images/seo.webp"
+  description: "A live multi-page demonstration of the nbis-folium skill."
+  favicon: "assets/favicon.png"
+  navbar:
+    logo: "assets/logos/nbis-scilifelab.webp"
+    logo-alt: "logo"
+    left:
+      - text: "Home"
+        href: "index.qmd"
+      - text: "Single-page demo"
+        href: "https://pyrevo.github.io/nbis-folium-skill/"
+      - text: "Skill source"
+        href: "https://github.com/pyrevo/nbis-folium-skill"
+  page-footer:
+    border: false
+    left: "{{< meta current_year >}} [NBIS](https://nbis.se)"
+    right: "Published with [Quarto](https://quarto.org/) v{{< meta quarto_version >}}"
+  sidebar:
+    contents:
+      - section: Reports
+        contents: "reports/*"
+      - "completion.qmd"
+  bread-crumbs: false
+
+nbis:
+  id: "DEMO-MULTI"
+  client: 
+    name: "Demo Client"
+    email: "client@demo.se"
+    org: "Demo Organisation"
+  pi:
+    name: "Demo PI"
+    email: "pi@demo.se"
+  analyst:
+    name: "NBIS Analyst"
+    email: "analyst@nbis.se"
+
+format:
+  html:
+    quarto-required: ">=1.8.25"
+    include-in-header: "assets/include_head.html"
+    theme: "assets/css/styles.scss"
+    smooth-scroll: true
+    toc: true
+    toc-depth: 5
+    toc-location: right
+    number-sections: true
+    number-depth: 4
+    code-fold: true
+    code-tools: false
+    code-copy: true
+    code-overflow: wrap
+    df-print: kable
+    standalone: false
+    fig-align: left
+    title-block-banner: "assets/images/banner.png"
+    author: "{{< meta nbis.analyst.name >}}"
+    date:  last-modified
+    date-format: "DD-MMM-YYYY"
+    image: "assets/images/featured.webp"
+    lightbox: auto
+
+crossref:
+  fig-title: "**Fig**"
+  fig-labels: arabic
+  tbl-title: "**Tab**"
+  tbl-labels: arabic
+  title-delim: "**:**"
+
+execute:
+  eval: true
+  echo: true
+  warning: false
+  message: false
+  freeze: false
+
+filters:
+  - assets/custom.lua
+  - collapse-output
+  - fontawesome

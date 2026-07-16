@@ -90,6 +90,9 @@ Then ask your coding agent to start a new NBIS folium report. The agent guides
 you through the template choice, project metadata, output directory, and
 R-support questions.
 
+Prefer a site with a sidebar, separate report pages, and a completion page?
+[View the multi-page `folium` demo](https://pyrevo.github.io/nbis-folium-skill/folium/).
+
 # Example scaffold layout
 
 A report scaffolded by the skill looks like this:

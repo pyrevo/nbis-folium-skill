@@ -17,7 +17,12 @@ skill_dir="$repo_root/skills/nbis-folium"
 tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/nbis-folium-integration.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT HUP INT TERM
 
-for template in folium folium-webpage; do
+templates=${NBIS_FOLIUM_TEMPLATES:-"folium folium-webpage"}
+for template in $templates; do
+  case "$template" in
+    folium|folium-webpage) ;;
+    *) echo "Unknown template: $template" >&2; exit 2 ;;
+  esac
   project="$tmp_dir/$template"
   mkdir -p "$project"
   (
@@ -51,7 +56,10 @@ for template in folium folium-webpage; do
     fi
     quarto render --output-dir report
     find report -type f -name '*.html' -print -quit | grep -q .
-    if [ "$template" = folium-webpage ]; then
+    if [ "$template" = folium ]; then
+      test -f report/assets/logos/nbis-scilifelab.webp
+      grep -R -Fq 'assets/logos/nbis-scilifelab.webp' report
+    else
       grep -R -Fq '<svg' report
     fi
   )

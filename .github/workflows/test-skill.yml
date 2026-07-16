@@ -6,6 +6,7 @@ on:
       - "skills/**"
       - "scripts/**"
       - "example/**"
+      - "example-folium/**"
       - ".github/workflows/test-skill.yml"
   push:
     branches: [main]
@@ -13,6 +14,7 @@ on:
       - "skills/**"
       - "scripts/**"
       - "example/**"
+      - "example-folium/**"
       - ".github/workflows/test-skill.yml"
   workflow_dispatch:
 

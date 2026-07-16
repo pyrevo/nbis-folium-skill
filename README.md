@@ -15,6 +15,9 @@ A live demo of the generated report (built from the real folium-webpage
 template, with full NBIS branding) is published here:
 <https://pyrevo.github.io/nbis-folium-skill/>
 
+The corresponding multi-page `folium` demo is published at:
+<https://pyrevo.github.io/nbis-folium-skill/folium/>
+
 ## What it does
 
 - Scaffolds a new report repo from the `folium` (multi-page) or

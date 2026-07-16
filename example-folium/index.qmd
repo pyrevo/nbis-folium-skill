@@ -1,0 +1,43 @@
+---
+title: "NBIS support {{< meta nbis.id >}}"
+subtitle: "nbis-folium-skill — multi-page live demo"
+date: ""
+author: ""
+toc: false
+number-sections: false
+format: html
+execute:
+  freeze: false
+---
+
+::: {.alert .alert-secondary}
+**NBIS ID**: {{< meta nbis.id >}}  
+**Request by**: {{< meta nbis.client.name >}} ({{< meta nbis.client.email >}})  
+**Principal Investigator**: {{< meta nbis.pi.name >}} ({{< meta nbis.pi.email >}})  
+**Organization**: {{< meta nbis.client.org >}}  
+**NBIS Staff**: {{< meta nbis.analyst.name >}} ({{< meta nbis.analyst.email >}})  
+:::
+
+This is a **live demonstration** of the multi-page report produced by the
+`nbis-folium` skill. It uses Roy Francis's
+[folium](https://github.com/royfrancis/folium) Quarto template, with the
+report section and completion page shown in the sidebar.
+
+The navbar logo is deliberately left as the upstream static asset. This proves
+that the multi-page template's standard asset pipeline works when published to
+GitHub Pages. The inline-SVG logo workaround is needed only by the separate
+[single-page demo](https://pyrevo.github.io/nbis-folium-skill/), whose logo is
+created at runtime.
+
+::: {.callout-tip}
+## Try both report styles
+
+- [View the single-page `folium-webpage` demo](https://pyrevo.github.io/nbis-folium-skill/)
+- [View the skill source](https://github.com/pyrevo/nbis-folium-skill)
+:::
+
+---
+
+::: {.small}
+Updated: {{< meta current_date >}}  at {{< meta current_time >}}.
+:::

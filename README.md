@@ -7,8 +7,9 @@ report using Roy Francis' [folium](https://github.com/royfrancis/folium)
 (single self-contained page) Quarto templates, with GitHub Pages publishing
 wired up automatically.
 
-The skill asks which report style you want, fills in the project metadata, and
-sets up everything needed to publish the report to GitHub Pages with one push.
+The skill asks which report style you want, safely applies project metadata,
+and configures a reproducible GitHub Pages workflow. It never treats a workflow
+file as proof that a site has been published.
 
 A live demo of the generated report (built from the real folium-webpage
 template, with full NBIS branding) is published here:
@@ -19,10 +20,10 @@ template, with full NBIS branding) is published here:
 - Scaffolds a new report repo from the `folium` (multi-page) or
   `folium-webpage` (single self-contained page) Quarto template
 - Installs the required Quarto extensions
-- Fills in the NBIS metadata (ID, client, PI, analyst, title)
+- Safely fills in the NBIS metadata (ID, client, PI, analyst, title)
 - Adds a GitHub Actions workflow that renders and publishes the report to
   GitHub Pages
-- Embeds the NBIS logo so it renders correctly in standalone HTML
+- Applies the inline-SVG standalone-logo fix for `folium-webpage` reports
 
 ## Install it
 
@@ -45,9 +46,17 @@ If your agent doesn't support the install command, copy the folder
 
 ## Requirements
 
-- [Quarto](https://quarto.org) >= 1.8.25
+- [Quarto](https://quarto.org) (the bundled example declares >= 1.8.25)
 - [Git](https://git-scm.com) and a GitHub account (for publishing)
 - The agent needs to be able to run shell commands
+- The agent needs filesystem access to the installed skill's `templates/`
+  directory; this is not a self-contained pasted prompt
+
+Reports with executable R code should commit an `renv.lock`. Reports with
+Python code should commit `requirements.txt` or be installable through
+`pyproject.toml`; the deployment workflow restores these dependencies
+conditionally. See the skill's compatibility and licensing references for the
+upstream-version and attribution policy.
 
 Publishing uses GitHub Pages, so the project must live in a GitHub repository
 and Pages must be enabled (Settings → Pages → Source: "GitHub Actions").
@@ -68,6 +77,9 @@ keep the licensing consistent end-to-end, this distribution repo (the skill
 packaging) is released under the same **CC-BY-NC-SA 4.0** license.
 
 Built using [Quarto](https://quarto.org/).
+
+Third-party components and branding considerations are listed in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## License
 

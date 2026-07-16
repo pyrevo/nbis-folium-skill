@@ -108,9 +108,10 @@ project/
 
 # Agent compatibility
 
-The skill works both as a native `skill` for agents that support one (OpenCode,
-Claude Code, Codex, …) and as a plain self-contained prompt for simpler agents
-— the template files are reproduced inline in `SKILL.md`.
+The skill works with agents that can read the installed skill directory and run
+shell commands (for example OpenCode, Claude Code, and Codex). It is not a
+self-contained pasted prompt: the standalone-logo fix is a bundled template
+file that must be copied verbatim.
 
 # License
 

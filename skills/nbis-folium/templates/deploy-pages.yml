@@ -2,7 +2,8 @@ name: Deploy report to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    # Replace with the repository's deployment branch after validating it.
+    branches: ["__DEFAULT_BRANCH__"]
   workflow_dispatch:
 
 permissions:
@@ -18,8 +19,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Set to "false" for pure-Python / markdown reports that contain no R chunks.
-      NEEDS_R: "true"
+      # Set these flags from the report's actual executable code.
+      NEEDS_R: "false"
+      NEEDS_PYTHON: "false"
+      # Must be a validated relative path, for example: report, docs, or _site.
+      REPORT_DIR: "__REPORT_DIR__"
     steps:
       - uses: actions/checkout@v4
 
@@ -27,22 +31,46 @@ jobs:
         if: ${{ env.NEEDS_R == 'true' }}
         uses: r-lib/actions/setup-r@v2
 
-      - name: Install R packages
-        if: ${{ env.NEEDS_R == 'true' }}
+      - name: Restore R dependencies
+        if: ${{ env.NEEDS_R == 'true' && hashFiles('renv.lock') != '' }}
+        uses: r-lib/actions/setup-renv@v2
+
+      - name: Require reproducible R dependencies
+        if: ${{ env.NEEDS_R == 'true' && hashFiles('renv.lock') == '' }}
         run: |
-          install.packages(c("knitr", "rmarkdown"))
-        shell: Rscript {0}
+          echo "R code was enabled but renv.lock is missing." >&2
+          echo "Create and commit renv.lock, or set NEEDS_R to false." >&2
+          exit 1
+
+      - name: Set up Python
+        if: ${{ env.NEEDS_PYTHON == 'true' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Restore Python dependencies
+        if: ${{ env.NEEDS_PYTHON == 'true' }}
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            python -m pip install -r requirements.txt
+          elif [ -f pyproject.toml ]; then
+            python -m pip install .
+          else
+            echo "Python code was enabled but requirements.txt or pyproject.toml is missing." >&2
+            exit 1
+          fi
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
       - name: Render report
-        run: quarto render --output-dir __REPORT_DIR__
+        run: quarto render --output-dir "$REPORT_DIR"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: __REPORT_DIR__
+          path: ${{ env.REPORT_DIR }}
 
   deploy:
     needs: build

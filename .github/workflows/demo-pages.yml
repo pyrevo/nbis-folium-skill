@@ -7,8 +7,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "example/**"
-      - "example-folium/**"
+      - "demo-folium-page/**"
+      - "demo-folium-site/**"
       - ".github/workflows/demo-pages.yml"
   workflow_dispatch:
 
@@ -37,10 +37,10 @@ jobs:
         run: scripts/prepare-fixtures.sh
 
       - name: Render demo report
-        run: quarto render example/index.qmd --output-dir ../demo
+        run: quarto render demo-folium-page/index.qmd --output-dir ../demo
 
       - name: Render multi-page demo
-        run: quarto render example-folium --output-dir ../demo/folium
+        run: quarto render demo-folium-site --output-dir ../demo/folium
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

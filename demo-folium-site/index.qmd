@@ -29,6 +29,11 @@ GitHub Pages. The inline-SVG logo workaround is needed only by the separate
 [single-page demo](https://pyrevo.github.io/nbis-folium-skill/), whose logo is
 created at runtime.
 
+A site like this one is scaffolded with `/folium-site`; the single-page variant
+with `/folium-page`. Both come from one `npx skills add`, aim to ask nothing, and
+leave a visible `TODO` rather than inventing metadata. The bundled Pages workflow
+restores dependencies with `renv`, pip, or `pixi`.
+
 ::: {.callout-tip}
 ## Try both report styles
 

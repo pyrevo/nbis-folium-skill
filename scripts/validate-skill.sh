@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # Validate the distributable skill without requiring Quarto. If Quarto is
-# available, also render the tracked examples as a smoke test.
+# available, also render the two tracked demo fixtures as a smoke test.
 set -eu
 
 skip_render=false
@@ -16,8 +16,8 @@ scaffold="$skill_dir/scripts/scaffold.sh"
 install_commands="$skill_dir/scripts/install-commands.sh"
 site_skill="$repo_root/skills/folium-site/SKILL.md"
 page_skill="$repo_root/skills/folium-page/SKILL.md"
-example="$repo_root/example"
-multi_example="$repo_root/example-folium"
+page_demo="$repo_root/demo-folium-page"
+site_demo="$repo_root/demo-folium-site"
 
 # --- Everything the skill must ship -----------------------------------------
 test -f "$skill_dir/SKILL.md"
@@ -25,8 +25,8 @@ test -f "$workflow"
 test -f "$logo"
 test -f "$skill_dir/references/compatibility.md"
 test -f "$skill_dir/references/licensing.md"
-test -f "$multi_example/_quarto.yml"
-test -f "$multi_example/assets/logos/nbis-scilifelab.webp"
+test -f "$site_demo/_quarto.yml"
+test -f "$site_demo/assets/logos/nbis-scilifelab.webp"
 
 # The scaffold script and command wrappers live inside the skill so they survive
 # `npx skills add`, which copies only skills/nbis-folium/.
@@ -248,7 +248,7 @@ if [ "$skip_render" = false ] && command -v quarto >/dev/null 2>&1; then
     exit 0
   fi
   output_dir="$tmp_dir/report"
-  (cd "$example" && quarto render index.qmd --output-dir "$output_dir")
+  (cd "$page_demo" && quarto render index.qmd --output-dir "$output_dir")
   test -f "$output_dir/index.html"
   # A bare `<svg` grep is a tautology here: the logo SVG is a string literal
   # inside the injected script, so it matches even when the logo never renders.
@@ -258,7 +258,7 @@ if [ "$skip_render" = false ] && command -v quarto >/dev/null 2>&1; then
   # Metadata substitution really resolved, rather than echoing the source YAML.
   grep -Fq 'DEMO-000' "$output_dir/index.html"
   multi_output_dir="$tmp_dir/folium"
-  (cd "$multi_example" && quarto render --output-dir "$multi_output_dir")
+  (cd "$site_demo" && quarto render --output-dir "$multi_output_dir")
   test -f "$multi_output_dir/index.html"
   test -f "$multi_output_dir/assets/logos/nbis-scilifelab.webp"
   grep -R -Fq 'assets/logos/nbis-scilifelab.webp' "$multi_output_dir"

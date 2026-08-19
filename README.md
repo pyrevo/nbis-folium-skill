@@ -193,7 +193,7 @@ same `scaffold.sh` the skill tells the agent to call. Keep it that way: when the
 test re-implemented the procedure instead, the documented commands silently
 rotted while CI stayed green.
 
-The demo fixtures under `example/` and `example-folium/` do not vendor their
+The demo fixtures under `demo-folium-page/` and `demo-folium-site/` do not vendor their
 Quarto extensions — `scripts/prepare-fixtures.sh` installs them at pinned
 versions, and both the validator and the demo workflow call it before rendering.
 A fresh clone therefore needs network access the first time it renders.

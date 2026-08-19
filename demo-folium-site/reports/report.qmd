@@ -1,0 +1,37 @@
+---
+title: Example report
+subtitle: "NBIS support {{< meta nbis.id >}}"
+description: "A minimal report section in the multi-page nbis-folium demo."
+code-tools: true
+---
+
+::: {.callout-note collapse="true"}
+
+## Versions
+
+**29-Mar-2025**  
+
+- First version
+
+:::
+
+## About this demo
+
+This small report section demonstrates the sidebar navigation, page layout,
+and shared NBIS branding of the `folium` multi-page template.
+
+## What the skill configures
+
+- project metadata, with the project title in `subtitle` so `title` keeps
+  deriving from the NBIS ID;
+- the GitHub Pages workflow, aligned with `project.output-dir` so a local render
+  and CI write to the same place;
+- required Quarto extensions, at pinned versions;
+- reproducible dependency handling when code is enabled — `renv.lock` for R,
+  `requirements.txt` or `pyproject.toml` for Python, or `pixi.lock` for a
+  pixi-managed environment.
+
+This fixture is tracked in the repository so the demo renders reproducibly,
+independent of upstream template changes. Its Quarto extensions are not vendored:
+they are installed at pinned versions at build time, which also means the demo
+build exercises the same install path the skill puts in front of users.

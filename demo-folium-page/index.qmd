@@ -72,13 +72,17 @@ The skill:
 
 - Scaffolds an NBIS project report from the `folium` (multi-page) or
   `folium-webpage` (single self-contained page) Quarto template
-- Installs the required Quarto extensions (fontawesome, collapse-output, accordion)
-- Fills in the NBIS metadata (ID, client, PI, analyst, title)
-- Adds a GitHub Actions workflow that renders and publishes the report to
-  GitHub Pages
+- Installs the required Quarto extensions at pinned versions (fontawesome,
+  collapse-output, accordion)
+- Fills in the NBIS metadata, putting the project title in `subtitle` so that
+  `title` keeps deriving from the NBIS ID as the templates intend
+- Leaves a visible `TODO` for anything it was not told, rather than inventing a
+  name or an email address
+- Adds a GitHub Actions workflow that renders and publishes to GitHub Pages,
+  supporting `renv`, pip, or `pixi`
 - Inlines the NBIS SciLifeLab logo as SVG markup (no external asset dependency)
   so it renders correctly in standalone HTML
-- Asks whether the report needs R support, and skips the R toolchain when not
+- Renders once to verify before reporting success
 
 # How to install
 
@@ -86,9 +90,16 @@ The skill:
 npx skills add pyrevo/nbis-folium-skill
 ```
 
-Then ask your coding agent to start a new NBIS folium report. The agent guides
-you through the template choice, project metadata, output directory, and
-R-support questions.
+That installs three skills, so you immediately get two commands and only have to
+decide which shape of report you want:
+
+- `/folium-page` — one single self-contained HTML page, like this one
+- `/folium-site` — a multi-page website with a sidebar and a completion page
+
+Both aim to ask nothing. If Quarto is installed and the target directory is
+empty, the agent scaffolds, configures, and renders without stopping. It
+interrupts only for project metadata it cannot invent, or if the directory
+already holds work.
 
 Prefer a site with a sidebar, separate report pages, and a completion page?
 [View the multi-page `folium` demo](https://pyrevo.github.io/nbis-folium-skill/folium/).
@@ -99,22 +110,29 @@ A report scaffolded by the skill looks like this:
 
 ```
 project/
-├── _quarto.yml          # (folium multi-page) or index.qmd (webpage)
+├── index.qmd            # single page; folium instead has _quarto.yml + reports/
 ├── assets/
-│   ├── include_logo.html
+│   ├── include_logo.html   # the inline-SVG standalone-logo fix
 │   └── ...
+├── _extensions/         # fontawesome, collapse-output, accordion (pinned)
 ├── .github/
 │   └── workflows/
 │       └── deploy-pages.yml
-└── AGENTS.md
+├── .gitignore           # ignores the render output and .quarto/
+└── report/              # rendered output, produced by the verification render
 ```
 
 # Agent compatibility
 
 The skill works with agents that can read the installed skill directory and run
 shell commands (for example OpenCode, Claude Code, and Codex). It is not a
-self-contained pasted prompt: the standalone-logo fix is a bundled template
-file that must be copied verbatim.
+self-contained pasted prompt: the mechanical half of the work lives in a bundled
+`scripts/scaffold.sh`, and the standalone-logo fix is a bundled template file
+that must be copied verbatim.
+
+On agents that expose skills as slash commands, `/folium-page` and `/folium-site`
+appear with no extra step. Agents that keep commands in their own directory can
+install them with the bundled `scripts/install-commands.sh`.
 
 # License
 

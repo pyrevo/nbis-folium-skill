@@ -24,7 +24,7 @@ extensions="quarto-ext/fontawesome:quarto-ext/fontawesome@v1.3.0
 mcanouil/collapse-output:mcanouil/quarto-collapse-output@1.4.0
 royfrancis/accordion:royfrancis/quarto-accordion@1.1.2"
 
-fixtures=${NBIS_FOLIUM_FIXTURES:-"example example-folium"}
+fixtures=${NBIS_FOLIUM_FIXTURES:-"demo-folium-page demo-folium-site"}
 
 for fixture in $fixtures; do
   dir="$repo_root/$fixture"

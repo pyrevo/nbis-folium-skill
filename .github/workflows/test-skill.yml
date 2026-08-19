@@ -5,16 +5,16 @@ on:
     paths:
       - "skills/**"
       - "scripts/**"
-      - "example/**"
-      - "example-folium/**"
+      - "demo-folium-page/**"
+      - "demo-folium-site/**"
       - ".github/workflows/test-skill.yml"
   push:
     branches: [main]
     paths:
       - "skills/**"
       - "scripts/**"
-      - "example/**"
-      - "example-folium/**"
+      - "demo-folium-page/**"
+      - "demo-folium-site/**"
       - ".github/workflows/test-skill.yml"
   workflow_dispatch:
 

@@ -7,8 +7,8 @@
 
 # Demo fixture extensions: installed by scripts/prepare-fixtures.sh at pinned
 # versions rather than vendored. They were two byte-identical 1.3 MB trees.
-/example/_extensions/
-/example-folium/_extensions/
+/demo-folium-page/_extensions/
+/demo-folium-site/_extensions/
 
 # Rendered demo output
 /demo/

@@ -28,6 +28,46 @@ The corresponding multi-page `folium` demo is published at:
   GitHub Pages
 - Applies the inline-SVG standalone-logo fix for `folium-webpage` reports
 
+## Two commands
+
+Once installed you get two slash commands, and the only thing you need to decide
+is which shape of report you want:
+
+| Command | What you get |
+| --- | --- |
+| `/folium-site` | Multi-page Quarto **website** (`folium`) — several report pages plus a completion page |
+| `/folium-page` | One single self-contained HTML **page** (`folium-webpage`) — travels as a single file |
+
+Both aim for zero questions. If Quarto is installed and the target directory is
+clear, the agent scaffolds, installs the extensions, applies the logo fix, writes
+the Pages workflow, and renders once to verify — without stopping.
+
+It will interrupt you for exactly two things:
+
+- **Project metadata it cannot invent** — NBIS ID, client, PI, analyst. Asked as
+  one batched question. Say "later" and you get explicit `TODO` placeholders and
+  a checklist instead; it will never make up a PI's email address.
+- **A non-empty target directory** — it refuses to merge into existing work
+  silently.
+
+Pass a path directly if you like: `/folium-page ~/projects/nbis-1234`.
+
+### Missing Quarto
+
+Quarto extensions and project-level R/Python dependencies install automatically.
+Quarto itself is **not** installed silently — it's a machine-wide change, and a
+half-finished system install costs far more to unpick than a three-second
+confirmation. If it's missing you get the exact command to run, or you can opt in
+explicitly:
+
+```
+/folium-site --install-deps
+```
+
+Even then it never runs `sudo` unattended: if elevation is the only route it
+prints the command and stops. On a shared or HPC system, look for a module or
+conda package first.
+
 ## Install it
 
 The skill follows the [skills.sh](https://skills.sh) layout, so most agents can
@@ -38,14 +78,29 @@ directory), run:
 npx skills add pyrevo/nbis-folium-skill
 ```
 
-This drops the skill into your agent's skills folder. After that, ask your agent
-to "start a new NBIS folium report" and it will guide you through the steps.
+Then install the two slash commands. Skills are portable but slash commands are
+not — every agent keeps them somewhere different — so a small script places them
+for whichever agents you have:
+
+```bash
+skills/nbis-folium/scripts/install-commands.sh          # or --dry-run first
+```
+
+It writes to `~/.claude/commands`, `~/.config/opencode/command`, and
+`~/.codex/prompts`, skipping any agent that isn't installed. Use
+`--scope project` to install into the current project instead. Reload your agent
+afterwards.
+
+Without the commands the skill still works — just ask for "a new NBIS folium
+report" and description-matching will find it. The commands exist so you don't
+have to remember a phrasing.
 
 ### Manual install
 
 If your agent doesn't support the install command, copy the folder
 `skills/nbis-folium/` into your agent's skills directory (for example
-`~/.config/opencode/skills/nbis-folium/`).
+`~/.config/opencode/skills/nbis-folium/`), then copy
+`skills/nbis-folium/commands/*.md` into wherever it keeps slash commands.
 
 ## Requirements
 

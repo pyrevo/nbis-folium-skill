@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # Validate the distributable skill without requiring Quarto. If Quarto is
-# available, also render the tracked example as a smoke test.
+# available, also render the tracked examples as a smoke test.
 set -eu
 
 skip_render=false
@@ -12,9 +12,13 @@ repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 skill_dir="$repo_root/skills/nbis-folium"
 workflow="$skill_dir/templates/deploy-pages.yml"
 logo="$skill_dir/templates/include_logo.html"
+scaffold="$skill_dir/scripts/scaffold.sh"
+install_commands="$skill_dir/scripts/install-commands.sh"
+commands_dir="$skill_dir/commands"
 example="$repo_root/example"
 multi_example="$repo_root/example-folium"
 
+# --- Everything the skill must ship -----------------------------------------
 test -f "$skill_dir/SKILL.md"
 test -f "$workflow"
 test -f "$logo"
@@ -23,8 +27,74 @@ test -f "$skill_dir/references/licensing.md"
 test -f "$multi_example/_quarto.yml"
 test -f "$multi_example/assets/logos/nbis-scilifelab.webp"
 
+# The scaffold script and command wrappers live inside the skill so they survive
+# `npx skills add`, which copies only skills/nbis-folium/.
+test -x "$scaffold" || { echo "not executable: $scaffold" >&2; exit 1; }
+test -x "$install_commands" || { echo "not executable: $install_commands" >&2; exit 1; }
+test -f "$commands_dir/folium-site.md"
+test -f "$commands_dir/folium-page.md"
+
+sh -n "$scaffold"
+sh -n "$install_commands"
+
+# --- The bug this repository has already shipped once ------------------------
+# Every `quarto use template` / `quarto add` invocation must carry --no-prompt.
+# Without it Quarto waits on an interactive trust confirmation and a
+# non-interactive agent shell blocks forever, creating no files.
+check_no_prompt() {
+  file=$1
+  # Strip comments so prose about the flag cannot satisfy or trip the check.
+  found=$(grep -E '^[[:space:]]*[^#]*quarto (use template|add) ' "$file" || true)
+  if [ -n "$found" ]; then
+    missing=$(printf '%s\n' "$found" | grep -vF -- '--no-prompt' || true)
+    if [ -n "$missing" ]; then
+      echo "Commands in $file are missing --no-prompt and will hang:" >&2
+      printf '%s\n' "$missing" >&2
+      exit 1
+    fi
+  fi
+  printf '%s' "$found"
+}
+
+# scaffold.sh is where these commands actually live, so require at least one
+# match there; a silently empty result would make this check vacuous.
+scaffold_cmds=$(check_no_prompt "$scaffold")
+if [ -z "$scaffold_cmds" ]; then
+  echo "No quarto use template/add commands found in $scaffold." >&2
+  echo "Either the script stopped scaffolding, or this check has gone stale." >&2
+  exit 1
+fi
+# SKILL.md should delegate rather than inline commands, but if prose ever
+# reintroduces them they must carry the flag too.
+check_no_prompt "$skill_dir/SKILL.md" >/dev/null
+
+# Machine-scoped installs must never escalate unattended. Match sudo only in
+# command position, so help text and error messages naming it still pass.
+if grep -nE '(^|[;&|]|\$\()[[:space:]]*sudo[[:space:]]' "$scaffold"; then
+  echo "$scaffold must never invoke sudo." >&2
+  exit 1
+fi
+
+# --- SKILL.md contract ------------------------------------------------------
 grep -Fq 'Python `folium`' "$skill_dir/SKILL.md"
-grep -Fq 'requires an agent that can read the installed skill directory' "$skill_dir/SKILL.md"
+grep -Fq 'Needs an agent that can read this skill directory' "$skill_dir/SKILL.md"
+# The delegation to the script is the thing that keeps docs and tests aligned.
+grep -Fq 'scripts/scaffold.sh' "$skill_dir/SKILL.md"
+# The title/subtitle distinction is easy to "simplify" away and silently wrong.
+grep -Fq 'subtitle' "$skill_dir/SKILL.md"
+
+# --- Command wrappers -------------------------------------------------------
+# Each wrapper must preselect exactly one template and defer to the skill, so
+# the procedure is never duplicated into them.
+grep -Fq 'folium-webpage' "$commands_dir/folium-page.md"
+grep -Fq 'nbis-folium' "$commands_dir/folium-page.md"
+grep -Fq 'nbis-folium' "$commands_dir/folium-site.md"
+if grep -Fq 'folium-webpage' "$commands_dir/folium-site.md"; then
+  echo "folium-site.md must not select the folium-webpage template." >&2
+  exit 1
+fi
+
+# --- Workflow template ------------------------------------------------------
 grep -Fq 'REPORT_DIR: "__REPORT_DIR__"' "$workflow"
 grep -Fq 'branches: ["__DEFAULT_BRANCH__"]' "$workflow"
 grep -Fq 'quarto render --output-dir "$REPORT_DIR"' "$workflow"
@@ -43,11 +113,51 @@ if grep -Fq '__DEFAULT_BRANCH__' "$tmp_dir/deploy-pages.yml" || grep -Fq '__REPO
 fi
 grep -Fq 'REPORT_DIR: "report"' "$tmp_dir/deploy-pages.yml"
 
+# --- Argument validation in scaffold.sh -------------------------------------
+# Cheap, no network: every one of these must be rejected before any file is
+# written, so a bad value can never reach sed or the filesystem.
+reject() {
+  if "$scaffold" --template folium --dir "$tmp_dir/never" "$@" >/dev/null 2>&1; then
+    echo "scaffold.sh accepted an argument it must reject: $*" >&2
+    exit 1
+  fi
+  if [ -e "$tmp_dir/never" ]; then
+    echo "scaffold.sh created $tmp_dir/never while rejecting: $*" >&2
+    exit 1
+  fi
+}
+reject --report-dir /absolute
+reject --report-dir ../escape
+reject --report-dir -dashy
+reject --report-dir ''
+reject --branch 'main;rm -rf /'
+reject --branch 'a|b'
+if "$scaffold" --template bogus --dir "$tmp_dir/never" >/dev/null 2>&1; then
+  echo "scaffold.sh accepted an unknown template." >&2
+  exit 1
+fi
+
+# --- Render fixtures --------------------------------------------------------
 if [ "$skip_render" = false ] && command -v quarto >/dev/null 2>&1; then
+  # The fixtures no longer vendor their Quarto extensions, so make sure they are
+  # present first. On a clean offline checkout this cannot succeed; degrade to
+  # static validation with a clear reason rather than failing the whole run.
+  if ! "$repo_root/scripts/prepare-fixtures.sh"; then
+    echo ""
+    echo "Static validation passed; render skipped because the fixture" >&2
+    echo "extensions are missing and could not be installed (offline?)." >&2
+    exit 0
+  fi
   output_dir="$tmp_dir/report"
   (cd "$example" && quarto render index.qmd --output-dir "$output_dir")
   test -f "$output_dir/index.html"
-  grep -Fq '<svg' "$output_dir/index.html"
+  # A bare `<svg` grep is a tautology here: the logo SVG is a string literal
+  # inside the injected script, so it matches even when the logo never renders.
+  # Assert the payload AND its injection target, which is what can actually fail.
+  grep -Fq 'viewBox="0 0 1497.39 194.27"' "$output_dir/index.html"
+  grep -Fq 'class="quarto-title-banner' "$output_dir/index.html"
+  # Metadata substitution really resolved, rather than echoing the source YAML.
+  grep -Fq 'DEMO-000' "$output_dir/index.html"
   multi_output_dir="$tmp_dir/folium"
   (cd "$multi_example" && quarto render --output-dir "$multi_output_dir")
   test -f "$multi_output_dir/index.html"

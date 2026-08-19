@@ -13,8 +13,13 @@ description: >-
 # NBIS Folium report scaffolder
 
 Create an NBIS-branded Quarto report from Roy Francis's `folium` multi-page
-template or `folium-webpage` single-page template. The skill configures project
-metadata, reproducible code dependencies, local validation, and GitHub Pages.
+template or `folium-webpage` single-page template.
+
+The mechanical half of this job lives in `scripts/scaffold.sh`. Call it rather
+than reproducing its steps: the script is what the repository's integration test
+exercises, so anything you re-derive by hand is untested. Your job is the half a
+script cannot do — choosing the template, collecting metadata, editing YAML in
+place, and deciding whether a directory is safe to touch.
 
 Read [references/compatibility.md](references/compatibility.md) before
 scaffolding and [references/licensing.md](references/licensing.md) before
@@ -22,85 +27,108 @@ redistributing a generated report.
 
 ## Required capabilities
 
-This skill requires an agent that can read the installed skill directory,
-including `templates/`, and execute shell commands. It also requires Git,
-Quarto, and network access while fetching upstream templates and extensions.
-It is **not** a self-contained pasted prompt because the corrected logo is in
-`templates/include_logo.html` and must be copied verbatim.
+Needs an agent that can read this skill directory (`scripts/`, `templates/`) and
+run shell commands, plus Quarto, Git, and network access. It is **not** a
+self-contained pasted prompt: the corrected logo and the scaffold script are
+files here.
 
-Do not install system software or publish, commit, or push without the user's
-explicit approval.
+## Aim for zero questions
 
-## 1. Inspect the target and tools
+Invoked through `/folium-site` or `/folium-page` the template is already chosen.
+Do not re-ask it, and do not ask for anything the invocation already answered.
+If the target directory is unambiguous and Quarto is present, scaffold without
+stopping to confirm.
 
-Run:
+Two things legitimately interrupt that, and nothing else should:
 
-```bash
-quarto --version
-git --version
-```
+**Metadata that cannot be invented.** NBIS ID, client, PI, and analyst details.
+Ask for these in one batched question, not an interrogation. If the user would
+rather not answer yet, scaffold with explicit `TODO` placeholders and list them
+at the end. Never fabricate a name, an email address, or an NBIS ID — a wrong
+PI address on a delivered report is worse than a visible `TODO`.
 
-If Quarto is unavailable, stop and direct the user to
-<https://quarto.org/docs/get-started/>. Do not recreate the upstream template
-by hand.
+**A directory that is not empty.** Never merge into existing work silently.
 
-Before changing files, inspect the target directory, `git status --short`, any
-existing Quarto configuration, and existing Pages workflows. Scaffold only
-into an empty directory by default. If the target is already a project or has
-unrelated uncommitted work, show the proposed changes and ask before merging or
-overwriting anything.
+## Dependency tiers
 
-## 2. Collect settings
+Treat these differently; they are not the same kind of "missing dependency".
 
-Obtain:
+| Tier | Examples | Behaviour |
+| --- | --- | --- |
+| Project-scoped | Quarto extensions | Install unattended, no prompt |
+| Project-scoped | R/Python packages via `renv`/venv inside the project | Install unattended |
+| Machine-scoped | Quarto, R, Python runtimes | Gated — see below |
+
+`scripts/scaffold.sh` handles the first tier itself.
+
+For machine-scoped tools the script detects what is missing and prints the exact
+install command. Pass `--install-deps` only when the user has actually asked for
+missing tools to be installed — a bare `/folium-page` is not that consent. The
+script never runs `sudo` unattended even with the flag; if the only route needs
+elevation it prints the command and stops. On a shared or HPC system, suggest
+looking for a module or conda package before any install.
+
+## 1. Inspect the target
+
+Check the target directory, `git status --short`, and any existing Quarto config
+or Pages workflow. Scaffold only into an empty or non-existent directory. If the
+target is already a project or holds unrelated uncommitted work, show what you
+propose to change and ask first.
+
+## 2. Settle the settings
 
 - template: `folium` (multi-page) or `folium-webpage` (single page);
 - target directory;
-- NBIS ID, title, client, PI, and analyst details;
-- output directory (default `report`);
-- whether the report executes R and/or Python code;
-- dependency files: `renv.lock` for R, and `requirements.txt` or
-  `pyproject.toml` for Python;
-- deployment branch (default: current branch; `main` for a new repository).
+- NBIS ID, title, client, PI, analyst details;
+- output directory — default `docs` for `folium` (matching upstream
+  `project.output-dir`), `report` for `folium-webpage`, which has no project
+  block;
+- deployment branch (default: current branch, or `main` for a new repository);
+- whether the report executes R and/or Python code.
 
-Unknown metadata must stay an explicit placeholder. Never invent contact
-details. Accept an output directory only when it is a non-empty relative path
-matching `^[A-Za-z0-9._/-]+$`; reject absolute paths, `..` segments, paths
-beginning with `-`, and newline characters.
+The script validates the output directory and branch: they must be non-empty
+relative paths matching `^[A-Za-z0-9._/-]+$`, with no absolute paths, no `..`
+segments, no leading `-`, and no newlines. Do not pre-format or quote them
+yourself, and do not interpolate them into a shell command.
 
-## 3. Scaffold and inspect the upstream result
-
-From the empty target directory, run exactly one command:
+## 3. Scaffold
 
 ```bash
-quarto use template royfrancis/folium
-# or
-quarto use template royfrancis/folium-webpage
+<skill-dir>/scripts/scaffold.sh --template folium --dir <target> \
+  --report-dir <dir> --branch <branch>
 ```
 
-Inspect the generated files before editing. `folium` must contain `_quarto.yml`
-and its configured `website.navbar.logo`; `folium-webpage` must contain
-`index.qmd` and `assets/include_logo.html`. If this structure differs, stop
-with a compatibility error rather than guessing paths.
+`<skill-dir>` is this skill's own installed directory, which is not your working
+directory — resolve it from the path you loaded `SKILL.md` from and pass it
+absolutely. `--dir` may be relative to the user's cwd.
 
-Install only extensions absent from the generated project, using the versions
-in `references/compatibility.md`:
+One command does all of the deterministic work: scaffolds the upstream template
+with `--no-prompt`, verifies the resulting layout, installs the three extensions
+if absent, applies the standalone-logo fix for `folium-webpage`, aligns
+`project.output-dir`, writes `.gitignore`, writes
+`.github/workflows/deploy-pages.yml` with placeholders substituted, and renders
+once to verify.
 
-```bash
-quarto add quarto-ext/fontawesome
-quarto add mcanouil/quarto-collapse-output@1.4.0
-quarto add royfrancis/quarto-accordion
-```
+`--no-prompt` is not optional tidiness — it is why this is a script. Without it
+Quarto waits on an interactive trust confirmation and a non-interactive agent
+shell blocks forever, creating no files.
 
-## 4. Update metadata safely
+If the script reports a layout mismatch, that is a compatibility failure against
+a changed upstream template. Stop and say so. Do not guess replacement paths or
+rebuild the template by hand.
+
+## 4. Write the metadata
+
+The script deliberately leaves this to you, because it needs judgement and must
+never be invented.
 
 - In `folium`, update the existing `nbis:` mapping in `_quarto.yml`.
-- In `folium-webpage`, update the existing `nbis:` mapping in `index.qmd` YAML
+- In `folium-webpage`, update the existing `nbis:` mapping in the `index.qmd`
   front matter.
 
-Preserve all unrelated configuration. Quote every user-provided YAML scalar,
-write UTF-8, and validate YAML/front matter before rendering. The example below
-illustrates the shape only; it is not permission to replace the whole file.
+Preserve all unrelated configuration, quote every user-provided scalar, write
+UTF-8, and re-validate the YAML afterwards. The shape below is an illustration,
+not permission to replace the file:
 
 ```yaml
 nbis:
@@ -117,60 +145,52 @@ nbis:
     email: "analyst@nbis.se"
 ```
 
-Set the report title in the template's existing title/site-title field.
+**The report title goes in `subtitle`, not `title`.** Both templates ship
+`title: "NBIS support {{< meta nbis.id >}}"`, deriving the heading from
+`nbis.id`; overwriting it breaks that link. `subtitle` holds the human-readable
+project title (upstream placeholder: `"Project title"`). Neither template has a
+`site-title`. For `folium` you may also update `website.description` and
+`website.site-url` in `_quarto.yml`.
 
 ## 5. Configure reproducible dependencies
 
-For R code, create and commit `renv.lock`; do not hardcode an assumed package
-list. For Python code, commit `requirements.txt` or use an installable project
-with `pyproject.toml`. `environment.yml` needs a project-specific CI setup and
-is not supported by the bundled workflow without adapting it.
+For R, create and commit `renv.lock`; never hardcode an assumed package list.
+For Python, commit `requirements.txt` or make the project installable via
+`pyproject.toml`. `environment.yml` needs project-specific CI changes and the
+bundled workflow does not support it unadapted.
 
-Set `NEEDS_R` and `NEEDS_PYTHON` in the workflow truthfully. Their default is
-`"false"`. The workflow deliberately fails when a selected runtime lacks its
-dependency manifest, preventing a misleading successful deployment.
+Set `NEEDS_R` and `NEEDS_PYTHON` in the workflow truthfully; both default to
+`"false"`. The workflow fails deliberately when a runtime is enabled without its
+manifest, rather than deploying something misleading.
 
-## 6. Apply the standalone-logo fix (folium-webpage only)
+## 6. Verify and report
 
-For `folium-webpage`, compare `assets/include_logo.html` with
-`templates/include_logo.html`. If the destination has user changes, show a diff
-or create a backup before replacement. Copy the bundled file exactly; do not
-retype the SVG.
-
-It contains inline SVG markup. Do not call it a base64 data URI and do not
-replace it with an external image path: the runtime-created image is not a
-static resource that Quarto can reliably embed.
-
-Current `folium` scaffolds use the configured `website.navbar.logo` asset and
-do not create `assets/include_logo.html`. Do not add or overwrite that file in
-`folium` projects unless a tested future upstream layout introduces it.
-
-## 7. Configure GitHub Pages
-
-Copy `templates/deploy-pages.yml` to `.github/workflows/deploy-pages.yml`.
-Replace only these placeholders after validation:
-
-- `__DEFAULT_BRANCH__` with the selected branch;
-- `__REPORT_DIR__` with the validated output directory.
-
-The output directory is passed through the quoted `$REPORT_DIR` environment
-variable. Do not inject a user value directly into a shell command. Merge with
-an existing Pages workflow only after review; never silently overwrite it.
-
-## 8. Validate and report
-
-Run:
+Re-render if you changed anything after the script ran:
 
 ```bash
 quarto render --output-dir "$REPORT_DIR"
 ```
 
-Check that HTML output exists, metadata is present, and no workflow placeholders
-remain. For `folium-webpage`, also verify the rendered report contains the
-inline NBIS SVG. Then report the files created/changed, any backups, template
-and Quarto versions, dependency strategy, and one precise status: **scaffolded
-locally**, **rendered locally**, **workflow configured**, **pushed**,
-**deployment running**, **deployment successful**, or **Pages site verified**.
+Confirm HTML exists and no workflow placeholders remain. Check metadata
+substitution by finding the configured NBIS ID **in the rendered HTML**, not by
+re-reading the source YAML.
 
-For GitHub Pages, the user must set **Settings → Pages → Source: GitHub
-Actions**. A workflow file alone is not proof that a site has been published.
+For `folium-webpage`, verifying the logo needs two assertions. Grepping the
+output for `<svg` proves nothing — the SVG is a string literal inside the
+injected `<script>`, so it matches whether or not the logo appears. Check that
+
+- the payload reached the output (`viewBox="0 0 1497.39 194.27"`), and
+- its injection target exists (`class="quarto-title-banner`).
+
+The second is the one that can fail: `insertImage` inserts into
+`.quarto-title-banner`, so if `title-block-banner` ever leaves the front matter
+the logo silently vanishes while an `<svg` grep still passes.
+
+Then report files created or changed, any backups, template and Quarto versions,
+dependency strategy, and one precise status: **scaffolded locally**, **rendered
+locally**, **workflow configured**, **pushed**, **deployment running**,
+**deployment successful**, or **Pages site verified**.
+
+Never publish, commit, or push without explicit approval. For GitHub Pages the
+user must set **Settings → Pages → Source: GitHub Actions** — a workflow file is
+not proof that a site was published.

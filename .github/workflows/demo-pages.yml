@@ -27,14 +27,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Under test: turn Pages on from inside the workflow, so a fresh repo
-      # needs no manual click in Settings and no local gh auth. If this proves
-      # out here, propagate it to the skill's templates/deploy-pages.yml.
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 

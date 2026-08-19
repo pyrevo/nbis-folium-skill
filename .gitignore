@@ -31,8 +31,11 @@ renv/staging/
 # Local agent instructions (not part of the distributable skill)
 AGENTS.md
 
-# Local audits and development notes
-/docs/
+# Local audits and development notes. Excluding the directory's contents rather
+# than the directory itself is deliberate: git will not descend into an excluded
+# directory, so a negation below could never re-include anything.
+/docs/*
+!/docs/CONTEXT.md
 
 # Skill-creator eval runs (large, regenerable)
 /evals-workspace/

@@ -57,9 +57,15 @@ Treat these differently; they are not the same kind of "missing dependency".
 | --- | --- | --- |
 | Project-scoped | Quarto extensions | Install unattended, no prompt |
 | Project-scoped | R/Python packages via `renv`/venv inside the project | Install unattended |
-| Machine-scoped | Quarto, R, Python runtimes | Gated — see below |
+| Machine-scoped | Quarto, R, Python runtimes | Gated, **required** — aborts when absent |
+| Machine-scoped | `gh` | Gated, **optional** — warns and continues |
 
 `scripts/scaffold.sh` handles the first tier itself.
+
+`gh` is optional because the scaffold is entirely correct without it; its only
+role is enabling GitHub Pages from the terminal (step 7). Missing it costs the
+user one click in Settings, so refusing to scaffold over it would be worse than
+carrying on with a clear note.
 
 For machine-scoped tools the script detects what is missing and prints the exact
 install command. Pass `--install-deps` only when the user has actually asked for
@@ -191,6 +197,33 @@ dependency strategy, and one precise status: **scaffolded locally**, **rendered
 locally**, **workflow configured**, **pushed**, **deployment running**,
 **deployment successful**, or **Pages site verified**.
 
-Never publish, commit, or push without explicit approval. For GitHub Pages the
-user must set **Settings → Pages → Source: GitHub Actions** — a workflow file is
-not proof that a site was published.
+Never publish, commit, or push without explicit approval.
+
+## 7. Enable GitHub Pages
+
+A workflow file is not proof that a site was published. Until Pages is switched
+to the GitHub Actions source, every run builds fine and deploys nowhere: the
+`deploy-pages` step fails with a 404 in the Actions log. Nobody is prompted, and
+no email says "authenticate" — so this step is easy to miss and worth being
+explicit about.
+
+With `gh` installed and authenticated, this can be done without leaving the
+terminal. It creates a public site, so treat it as outward-facing and get
+explicit approval first:
+
+```bash
+gh api -X POST "repos/<owner>/<repo>/pages" -f build_type=workflow
+```
+
+It needs admin rights on the repository, and returns 409 if Pages is already
+configured — treat that as success, not failure. Check the current state first
+with `gh api "repos/<owner>/<repo>/pages"`; `"build_type": "workflow"` means it
+is already correct and nothing needs doing.
+
+If `gh` is missing or unauthenticated, say plainly that the user must set
+**Settings → Pages → Source: GitHub Actions** by hand, and report the status as
+**workflow configured** rather than implying a live site.
+
+Two caveats worth passing on: Pages on a **private** repository requires a paid
+GitHub plan, and the first deployment can take a few minutes to become
+reachable. Verify the real URL before claiming **Pages site verified**.

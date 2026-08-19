@@ -13,8 +13,14 @@ relevant owner before redistribution outside the intended NBIS context.
 
 Installed Quarto extensions have their own upstream licenses. Keep their
 bundled license files and review them when adding or redistributing extension
-assets. In particular, the tracked Font Awesome assets retain their upstream
-license notice in `_extensions/quarto-ext/fontawesome/assets/LICENSE.txt`.
+assets. In particular, Font Awesome carries its upstream license notice in
+`_extensions/quarto-ext/fontawesome/assets/LICENSE.txt`; that notice travels
+with the extension when `quarto add` installs it into a scaffolded report, and
+must be preserved there.
+
+This repository no longer vendors extensions into its demo fixtures -- they are
+installed at build time by `scripts/prepare-fixtures.sh` -- so no extension
+license files are redistributed by this repository itself.
 
 The inline SVG in `templates/include_logo.html` is a locally maintained
 standalone-rendering workaround for `folium-webpage`. Preserve any provenance

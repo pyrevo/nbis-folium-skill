@@ -36,8 +36,8 @@ Only two things should interrupt: project metadata that cannot be invented (NBIS
 ID, client, PI, analyst — ask once, batched), and a target directory that is not
 empty. If the user would rather fill metadata in later, scaffold with explicit
 `TODO` placeholders and list them at the end. Never fabricate a client or PI
-name, email address, or NBIS ID. The analyst may come from `git config`, since
-whoever runs this is usually the analyst — but only when it looks like a work
-identity (a name with a space, an institutional address), because a git handle or
-personal address on a client deliverable is worse than a visible gap. Say which
-values came from `git config`, and prefer a `TODO` on a shared or CI machine.
+name, email address, or NBIS ID. The analyst is usually the user, so a name may be
+derived from a supplied institutional address when its local part is a clean
+`first.last` pair, or taken from `git config` when that looks like a work identity
+rather than a code-hosting handle and personal address. Say which values were
+inferred and where from, and fall back to a `TODO` rather than guessing.

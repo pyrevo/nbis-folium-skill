@@ -114,8 +114,10 @@ grep -Fq 'never be written into these skill files' "$skill_dir/SKILL.md" \
   || { echo "SKILL.md must forbid real identities in the skill files." >&2; exit 1; }
 # A tested machine returned a git handle and a gmail address; writing those into
 # a client deliverable is worse than a TODO, so the plausibility check must stay.
-grep -Fq 'candidate to check' "$skill_dir/SKILL.md" \
-  || { echo "SKILL.md must treat the git identity as a checked candidate." >&2; exit 1; }
+grep -Fq 'only when they look like a work' "$skill_dir/SKILL.md" \
+  || { echo "SKILL.md must gate the git identity on looking work-shaped." >&2; exit 1; }
+grep -Fq 'clean `first.last` pair' "$skill_dir/SKILL.md" \
+  || { echo "SKILL.md must scope email-derived names to clean first.last." >&2; exit 1; }
 for wrapper in "$site_skill" "$page_skill"; do
   grep -Fq 'git config' "$wrapper" \
     || { echo "$wrapper must state where the analyst may come from." >&2; exit 1; }

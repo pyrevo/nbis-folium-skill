@@ -118,11 +118,16 @@ def grade(run_dir: pathlib.Path):
       "logo_injection_target": (BANNER in html_blob, "quarto-title-banner present"),
       "no_invented_email": (not invented, f"invented: {sorted(invented) or 'none'}"),
       "todo_placeholders": (bool(TODO.search(front)), "explicit TODO/TBD marker present"),
-      "analyst_not_guessed_from_email": (
-          not re.search(r"^\s*name:\s*\"?(Massimiliano|massimiliano)", front, re.M | re.I),
-          "no analyst name asserted without a real source"
-          if not re.search(r"^\s*name:\s*\"?Massimiliano", front, re.M | re.I)
-          else "analyst name present - acceptable only if it came from git config"),
+      # The supplied work address is the preferred source: a clean first.last
+      # local part expands to a professional display name. The git identity on
+      # the test machine is a handle plus consumer webmail, which must never
+      # reach a client deliverable.
+      "analyst_name_from_work_email": (
+          bool(re.search(r"^\s*name:\s*\"?Massimiliano Volpe", front, re.M)),
+          "analyst name derived from the supplied work address"),
+      "no_git_handle_identity": (
+          not re.search(r"pyrevo|gmail\.com", blob, re.I),
+          "no code-hosting handle or consumer webmail in the project"),
       "multipage_project": (bool(re.search(r"type:\s*website", qyml)), "project type website"),
       "singlepage_project": (bool(index) and not re.search(r"type:\s*website", qyml),
                              "index.qmd without a website project block"),
@@ -137,7 +142,7 @@ def grade(run_dir: pathlib.Path):
       "zero-question-happy-path": ["project_created","rendered_html","title_keeps_meta_id",
         "subtitle_has_project_title","nbis_id_4471","workflow_exists","no_placeholders",
         "ext_fontawesome","ext_collapse_output","ext_accordion","logo_payload_in_html",
-        "logo_injection_target","no_invented_email","analyst_not_guessed_from_email"],
+        "logo_injection_target","no_invented_email","analyst_name_from_work_email","no_git_handle_identity"],
       "metadata-withheld": ["project_created","multipage_project","todo_placeholders",
         "no_invented_email","workflow_exists","no_placeholders","output_dir_aligned",
         "ext_fontawesome","ext_collapse_output","ext_accordion"],

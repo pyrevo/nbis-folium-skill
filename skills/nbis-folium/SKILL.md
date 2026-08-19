@@ -154,31 +154,37 @@ nbis:
 ### Where identity may come from
 
 **Client and PI** come only from what the user says. They are never the person at
-the keyboard, so there is nothing to infer from and a guess would simply be wrong.
+the keyboard, so there is nothing to infer from and a guess would just be wrong.
 
-**The analyst** is usually the person at the keyboard, so `git config user.name`
-and `user.email` are the right place to look when the user has not said. Treat
-what you find as a candidate to check, not a value to write: developers commonly
-keep a handle and a personal address there, and a git handle in the analyst field
-of a client deliverable is worse than an obvious gap.
+**The analyst** is usually the user. Prefer these sources in order, and say in
+your final report which of them you used for each value, so anything inferred is
+visible and one edit away rather than silently shipped on a deliverable.
 
-Use the git identity when it looks like a work identity — a name with a space in
-it, and an institutional address such as `@nbis.se` or the user's own domain.
-Otherwise put a `TODO` in the field and say what you found, so the user can paste
-the right value in one edit. This is not hypothetical: on a machine this was
-tested against, `git config` held a bare one-word code-hosting handle and a
-consumer webmail address, either of which would otherwise have gone out on a
-report to a client.
+1. **What the user states.** Always best.
 
-Either way, say in your final report which values came from `git config`, so a
-wrong guess is visible rather than silently shipped. And treat the git identity as
-unavailable when the machine plainly is not the analyst's — a shared workstation
-or a CI runner, which you can usually tell from `$CI` or `$GITHUB_ACTIONS`.
+2. **An institutional email they supplied.** NBIS addresses put
+   `firstname.lastname` in front of the domain, so a local part like
+   `anna.lindqvist` gives "Anna Lindqvist" reliably. Do this when the local part
+   is a clean `first.last` pair, capitalising each part. It is the common case:
+   the user mentions their work address and expects their name to follow from it.
 
-Do not reconstruct a display name from an email's local part. A local part like
-`a.k.svensson` is not reliably "A K Svensson", and unlike `git config user.name`
-it is a guess at spelling rather than a stored fact. If only an email is known,
-set the email and leave the name a `TODO`.
+   Skip it when the local part is not a clean pair — a single token, three or
+   more parts, or an initial such as `a.k.svensson`, where the expansion of `k`
+   is a guess. Then leave the name a `TODO` and keep the email.
+
+3. **`git config user.name` / `user.email`,** only when they look like a work
+   identity: a name containing a space, and an institutional address. Many
+   developers keep a code-hosting handle and a consumer webmail address here —
+   on one tested machine `git config` held exactly that, and both would have gone
+   out on a report to a client. A handle in the analyst field is worse than an
+   obvious gap.
+
+4. **A `TODO`,** naming what you found so the user can paste the right value in
+   one edit.
+
+Treat the git identity as unavailable when the machine plainly is not the
+analyst's, such as a shared workstation or a CI runner — `$CI` and
+`$GITHUB_ACTIONS` usually tell you.
 
 None of this ever becomes part of the skill itself: a real name or address must
 never be written into these skill files, which are shared with colleagues.

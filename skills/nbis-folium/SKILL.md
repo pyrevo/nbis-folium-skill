@@ -160,14 +160,25 @@ project title (upstream placeholder: `"Project title"`). Neither template has a
 
 ## 5. Configure reproducible dependencies
 
-For R, create and commit `renv.lock`; never hardcode an assumed package list.
-For Python, commit `requirements.txt` or make the project installable via
-`pyproject.toml`. `environment.yml` needs project-specific CI changes and the
-bundled workflow does not support it unadapted.
+Pick one of two strategies and declare it in the workflow truthfully. All three
+flags default to `"false"`, and the workflow fails deliberately when a runtime is
+enabled without its lockfile rather than deploying something misleading.
 
-Set `NEEDS_R` and `NEEDS_PYTHON` in the workflow truthfully; both default to
-`"false"`. The workflow fails deliberately when a runtime is enabled without its
-manifest, rather than deploying something misleading.
+**Per-language.** Set `NEEDS_R` and/or `NEEDS_PYTHON`. For R, create and commit
+`renv.lock`; never hardcode an assumed package list. For Python, commit
+`requirements.txt` or make the project installable via `pyproject.toml`.
+
+**pixi.** Set `USE_PIXI: "true"` and commit `pixi.lock`. This covers R and Python
+together and replaces the per-language setup: the workflow skips `setup-r` and
+`setup-python` entirely and renders with `pixi run quarto render`, so the pixi
+environment is active. Quarto still comes from `quarto-actions/setup` — `pixi
+run` prepends its environment to `PATH` but inherits the rest, so both are found.
+
+If a project uses pixi, prefer `USE_PIXI` over the per-language flags. Setting
+both is contradictory: pixi wins and the others are ignored.
+
+`environment.yml` (conda) still needs project-specific CI changes and the bundled
+workflow does not support it unadapted.
 
 ## 6. Verify and report
 

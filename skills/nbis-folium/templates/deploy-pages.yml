@@ -22,34 +22,38 @@ jobs:
       # Set these flags from the report's actual executable code.
       NEEDS_R: "false"
       NEEDS_PYTHON: "false"
+      # Set to "true" when the project's environment is managed by pixi. This
+      # replaces the R and Python setup below: pixi provides both, and the
+      # render runs inside `pixi run` so the environment is active.
+      USE_PIXI: "false"
       # Must be a validated relative path, for example: report, docs, or _site.
       REPORT_DIR: "__REPORT_DIR__"
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up R
-        if: ${{ env.NEEDS_R == 'true' }}
+        if: ${{ env.USE_PIXI != 'true' && env.NEEDS_R == 'true' }}
         uses: r-lib/actions/setup-r@v2
 
       - name: Restore R dependencies
-        if: ${{ env.NEEDS_R == 'true' && hashFiles('renv.lock') != '' }}
+        if: ${{ env.USE_PIXI != 'true' && env.NEEDS_R == 'true' && hashFiles('renv.lock') != '' }}
         uses: r-lib/actions/setup-renv@v2
 
       - name: Require reproducible R dependencies
-        if: ${{ env.NEEDS_R == 'true' && hashFiles('renv.lock') == '' }}
+        if: ${{ env.USE_PIXI != 'true' && env.NEEDS_R == 'true' && hashFiles('renv.lock') == '' }}
         run: |
           echo "R code was enabled but renv.lock is missing." >&2
           echo "Create and commit renv.lock, or set NEEDS_R to false." >&2
           exit 1
 
       - name: Set up Python
-        if: ${{ env.NEEDS_PYTHON == 'true' }}
+        if: ${{ env.USE_PIXI != 'true' && env.NEEDS_PYTHON == 'true' }}
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Restore Python dependencies
-        if: ${{ env.NEEDS_PYTHON == 'true' }}
+        if: ${{ env.USE_PIXI != 'true' && env.NEEDS_PYTHON == 'true' }}
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then
@@ -61,10 +65,32 @@ jobs:
             exit 1
           fi
 
+      # pixi.lock is to pixi what renv.lock is to renv: without it the build is
+      # not reproducible, so fail rather than deploy something misleading.
+      - name: Require a pixi lockfile
+        if: ${{ env.USE_PIXI == 'true' && hashFiles('pixi.lock') == '' }}
+        run: |
+          echo "USE_PIXI is true but pixi.lock is missing." >&2
+          echo "Commit pixi.lock, or set USE_PIXI to false." >&2
+          exit 1
+
+      - name: Set up pixi
+        if: ${{ env.USE_PIXI == 'true' }}
+        uses: prefix-dev/setup-pixi@v0.10.1
+        with:
+          cache: true
+
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
+      # `pixi run` prepends the environment to PATH but inherits the rest, so
+      # Quarto installed above is still found while python/R come from pixi.
+      - name: Render report (pixi)
+        if: ${{ env.USE_PIXI == 'true' }}
+        run: pixi run quarto render --output-dir "$REPORT_DIR"
+
       - name: Render report
+        if: ${{ env.USE_PIXI != 'true' }}
         run: quarto render --output-dir "$REPORT_DIR"
 
       - name: Upload artifact

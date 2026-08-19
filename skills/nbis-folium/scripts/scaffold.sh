@@ -301,7 +301,9 @@ Still to do (not this script's job):
      contact details; leave an explicit TODO where a value is unknown.
   2. Set the project title in "subtitle". Leave "title" as
      "NBIS support {{< meta nbis.id >}}" so the heading tracks nbis.id.
-  3. Set NEEDS_R / NEEDS_PYTHON in the workflow, and commit renv.lock or
-     requirements.txt / pyproject.toml if either is enabled.
+  3. Declare the runtime in the workflow and commit a lockfile:
+       - renv.lock for R (NEEDS_R), requirements.txt or pyproject.toml for
+         Python (NEEDS_PYTHON);
+       - or set USE_PIXI: "true" and commit pixi.lock, which covers both.
   4. Enable Pages: Settings -> Pages -> Source: GitHub Actions.
 EOF

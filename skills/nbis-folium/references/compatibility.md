@@ -13,6 +13,7 @@ release of this skill.
 | `quarto-ext/fontawesome` | Pinned to `@v1.3.0` when added (note the `v` prefix). | 1.3.0 in integration on 2026-07-16. |
 | `mcanouil/quarto-collapse-output` | Pinned to `1.4.0` when added. | 1.4.0 in integration on 2026-07-16. |
 | `royfrancis/quarto-accordion` | Pinned to `@1.1.2` when added (no `v` prefix). | 1.1.2 in integration on 2026-07-16. |
+| `prefix-dev/setup-pixi` | Pinned to `v0.10.1` in the workflow template. A 0.x action can break within its major, so do not float to `@v0`. | v0.10.1 was latest on 2026-08-19. |
 
 The skill currently does not pin the template repositories because `quarto use
 template` does not provide a tested release identifier in this workflow. Treat
@@ -48,6 +49,21 @@ script `SKILL.md` tells the agent to call. Keep it that way. When the test
 re-implemented the procedure instead, the documented commands silently rotted:
 they lacked `--no-prompt`, so they deadlocked on Quarto's trust confirmation in
 any non-interactive shell while CI stayed green.
+
+## Environment managers
+
+The bundled workflow supports two strategies: per-language (`NEEDS_R` with
+`renv.lock`, `NEEDS_PYTHON` with `requirements.txt` or `pyproject.toml`) and
+pixi (`USE_PIXI` with `pixi.lock`). `USE_PIXI` takes precedence and skips the
+per-language setup steps.
+
+Verified locally on 2026-08-19 that `pixi run` prepends its environment to
+`PATH` while inheriting the rest: a Quarto installed outside the pixi
+environment is still resolved, and a Python chunk executes against the pixi
+environment's interpreter. That is why the workflow can keep using
+`quarto-actions/setup` alongside pixi.
+
+conda `environment.yml` remains unsupported without adapting the workflow.
 
 ## Dependency policy
 

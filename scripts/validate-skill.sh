@@ -98,6 +98,27 @@ fi
 grep -Fq 'REPORT_DIR: "__REPORT_DIR__"' "$workflow"
 grep -Fq 'branches: ["__DEFAULT_BRANCH__"]' "$workflow"
 grep -Fq 'quarto render --output-dir "$REPORT_DIR"' "$workflow"
+
+# --- pixi support in the workflow template ----------------------------------
+grep -Fq 'USE_PIXI: "false"' "$workflow"
+grep -Fq 'pixi run quarto render --output-dir "$REPORT_DIR"' "$workflow"
+grep -Fq "hashFiles('pixi.lock') == ''" "$workflow"
+# setup-pixi is a 0.x action, where a floating major may break. Require a pin.
+if grep -Eq 'prefix-dev/setup-pixi@v0$|prefix-dev/setup-pixi@main' "$workflow"; then
+  echo "Pin prefix-dev/setup-pixi to an exact version, not a floating ref." >&2
+  exit 1
+fi
+grep -Eq 'prefix-dev/setup-pixi@v[0-9]+\.[0-9]+\.[0-9]+' "$workflow" \
+  || { echo "prefix-dev/setup-pixi must be pinned to an exact version." >&2; exit 1; }
+# pixi must replace the per-language setup, not run alongside it.
+for step in 'Set up R' 'Set up Python' 'Restore Python dependencies'; do
+  line=$(grep -A1 -F "name: $step" "$workflow" | grep 'if:' || true)
+  case "$line" in
+    *"USE_PIXI != 'true'"*) ;;
+    *) echo "Step '$step' must be skipped when USE_PIXI is true." >&2; exit 1 ;;
+  esac
+done
+
 grep -Fq '<svg' "$logo"
 if grep -Fq 'data:image' "$logo"; then
   echo "The logo template must use inline SVG, not a data URI." >&2

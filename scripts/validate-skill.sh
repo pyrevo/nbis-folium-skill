@@ -90,6 +90,50 @@ if grep -nE '(^|[;&|]|\$\()[[:space:]]*sudo[[:space:]]' "$scaffold"; then
   exit 1
 fi
 
+# --- No personal data may ship in the package -------------------------------
+# The skill is distributed to colleagues, so a real name or address left in it
+# would travel to every install. Only these generic placeholders are allowed.
+allowed_emails='client@org.se pi@org.se analyst@nbis.se'
+found_emails=$(grep -rhoE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' "$repo_root/skills" \
+  | grep -vE '@v[0-9]' | sort -u || true)
+for e in $found_emails; do
+  case " $allowed_emails " in
+    *" $e "*) ;;
+    *) echo "Unexpected email address in the shipped skill: $e" >&2
+       echo "Only generic placeholders may ship: $allowed_emails" >&2
+       exit 1 ;;
+  esac
+done
+
+# Client and PI must never be inferred, the analyst's provenance must be
+# disclosed, and no real identity may be written into the shared skill files.
+# The email check above is the load-bearing guard; these keep the guidance intact.
+grep -Fq 'Where identity may come from' "$skill_dir/SKILL.md" \
+  || { echo "SKILL.md must keep the identity-provenance section." >&2; exit 1; }
+grep -Fq 'never be written into these skill files' "$skill_dir/SKILL.md" \
+  || { echo "SKILL.md must forbid real identities in the skill files." >&2; exit 1; }
+# A tested machine returned a git handle and a gmail address; writing those into
+# a client deliverable is worse than a TODO, so the plausibility check must stay.
+grep -Fq 'candidate to check' "$skill_dir/SKILL.md" \
+  || { echo "SKILL.md must treat the git identity as a checked candidate." >&2; exit 1; }
+for wrapper in "$site_skill" "$page_skill"; do
+  grep -Fq 'git config' "$wrapper" \
+    || { echo "$wrapper must state where the analyst may come from." >&2; exit 1; }
+done
+
+# The email check cannot see handles. The repo owner's handle is legitimate in
+# the distribution URL and the npx command, but nowhere else -- an example that
+# happens to use a real handle would ship it to every colleague.
+owner=pyrevo
+bad_handle=$(grep -rn "$owner" "$repo_root/skills" \
+  | grep -vF "github.com/$owner/nbis-folium-skill" \
+  | grep -vF "npx skills add $owner/nbis-folium-skill" || true)
+if [ -n "$bad_handle" ]; then
+  echo "The owner handle '$owner' appears outside the distribution URL:" >&2
+  printf '%s\n' "$bad_handle" >&2
+  exit 1
+fi
+
 # --- SKILL.md contract ------------------------------------------------------
 grep -Fq 'Python `folium`' "$skill_dir/SKILL.md"
 grep -Fq 'Needs an agent that can read this skill directory' "$skill_dir/SKILL.md"

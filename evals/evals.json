@@ -1,0 +1,57 @@
+{
+  "skill_name": "nbis-folium",
+  "evals": [
+    {
+      "id": 0,
+      "name": "zero-question-happy-path",
+      "prompt": "set up a new NBIS report in <target-dir>/nbis-4471, single self-contained page. NBIS ID is SMS-4471-24, client is Anna Lindqvist (anna.lindqvist@ki.se) at Karolinska, PI is Erik Ohlsson (erik.ohlsson@ki.se), I'm the analyst - massimiliano.volpe@nbis.se. Title it 'Methylation profiling of cord blood samples'.",
+      "expected_output": "A scaffolded folium-webpage project, no questions asked, title left deriving from nbis.id with the project title in subtitle, Pages workflow with placeholders substituted, renders with the inline NBIS logo.",
+      "assertions": [
+        "Rendered HTML exists in the report output directory",
+        "title: still contains {{< meta nbis.id >}} rather than the project title",
+        "The project title 'Methylation profiling of cord blood samples' appears in subtitle:",
+        "nbis.id is set to SMS-4471-24",
+        ".github/workflows/deploy-pages.yml exists",
+        "No __DEFAULT_BRANCH__ or __REPORT_DIR__ placeholder remains in the workflow",
+        "All three Quarto extensions are installed (fontawesome, collapse-output, accordion)",
+        "Rendered HTML contains the NBIS logo payload viewBox=\"0 0 1497.39 194.27\"",
+        "Rendered HTML contains the injection target class=\"quarto-title-banner\"",
+        "No email address appears that was not supplied in the prompt"
+      ],
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "metadata-withheld",
+      "prompt": "make me a multi-page NBIS folium report in <target-dir>/nbis-new - I don't have the client or PI details yet, just get the skeleton up and I'll fill it in",
+      "expected_output": "A scaffolded folium (multi-page) project with visible TODO placeholders for the unknown metadata and no invented names or email addresses.",
+      "assertions": [
+        "A multi-page folium project was created (_quarto.yml with project type website)",
+        "Unknown client/PI metadata is marked with a visible TODO placeholder",
+        "No invented email address appears anywhere in the project",
+        "No invented person name appears for client or PI",
+        ".github/workflows/deploy-pages.yml exists",
+        "No __DEFAULT_BRANCH__ or __REPORT_DIR__ placeholder remains in the workflow",
+        "project.output-dir in _quarto.yml matches REPORT_DIR in the workflow",
+        "All three Quarto extensions are installed"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "pixi-user",
+      "prompt": "new NBIS single-page report in <target-dir>/dmr-report, we manage the env with pixi. NBIS ID SMS-8812-25, everything else TBD.",
+      "expected_output": "A scaffolded folium-webpage project with USE_PIXI set to true in the workflow, pixi.lock required, and TODO placeholders for the unsupplied metadata.",
+      "assertions": [
+        "A single-page folium-webpage project was created (index.qmd, no project website block)",
+        "USE_PIXI is set to \"true\" in the workflow",
+        "nbis.id is set to SMS-8812-25",
+        "Unsupplied metadata is marked with a visible TODO placeholder",
+        "No invented email address appears anywhere in the project",
+        "Rendered HTML contains the NBIS logo payload and the quarto-title-banner target",
+        "No workflow placeholder remains"
+      ],
+      "files": []
+    }
+  ]
+}

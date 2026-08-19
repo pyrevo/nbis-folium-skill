@@ -151,6 +151,38 @@ nbis:
     email: "analyst@nbis.se"
 ```
 
+### Where identity may come from
+
+**Client and PI** come only from what the user says. They are never the person at
+the keyboard, so there is nothing to infer from and a guess would simply be wrong.
+
+**The analyst** is usually the person at the keyboard, so `git config user.name`
+and `user.email` are the right place to look when the user has not said. Treat
+what you find as a candidate to check, not a value to write: developers commonly
+keep a handle and a personal address there, and a git handle in the analyst field
+of a client deliverable is worse than an obvious gap.
+
+Use the git identity when it looks like a work identity — a name with a space in
+it, and an institutional address such as `@nbis.se` or the user's own domain.
+Otherwise put a `TODO` in the field and say what you found, so the user can paste
+the right value in one edit. This is not hypothetical: on a machine this was
+tested against, `git config` held a bare one-word code-hosting handle and a
+consumer webmail address, either of which would otherwise have gone out on a
+report to a client.
+
+Either way, say in your final report which values came from `git config`, so a
+wrong guess is visible rather than silently shipped. And treat the git identity as
+unavailable when the machine plainly is not the analyst's — a shared workstation
+or a CI runner, which you can usually tell from `$CI` or `$GITHUB_ACTIONS`.
+
+Do not reconstruct a display name from an email's local part. A local part like
+`a.k.svensson` is not reliably "A K Svensson", and unlike `git config user.name`
+it is a guess at spelling rather than a stored fact. If only an email is known,
+set the email and leave the name a `TODO`.
+
+None of this ever becomes part of the skill itself: a real name or address must
+never be written into these skill files, which are shared with colleagues.
+
 **The report title goes in `subtitle`, not `title`.** Both templates ship
 `title: "NBIS support {{< meta nbis.id >}}"`, deriving the heading from
 `nbis.id`; overwriting it breaks that link. `subtitle` holds the human-readable

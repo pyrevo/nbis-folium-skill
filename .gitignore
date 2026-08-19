@@ -33,3 +33,6 @@ AGENTS.md
 
 # Local audits and development notes
 /docs/
+
+# Skill-creator eval runs (large, regenerable)
+/evals-workspace/

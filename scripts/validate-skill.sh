@@ -38,6 +38,20 @@ test -f "$page_skill"
 sh -n "$scaffold"
 sh -n "$install_commands"
 
+# install-commands.sh copies files, so it must also be able to remove them.
+grep -Fq -- '--uninstall' "$install_commands" \
+  || { echo "$install_commands must support --uninstall." >&2; exit 1; }
+# Uninstalling must target the two known filenames, never a glob or the whole dir.
+if grep -qE 'rm -rf "\$dest"|rm .*\$dest"?/\*' "$install_commands"; then
+  echo "$install_commands must not delete whole command directories." >&2
+  exit 1
+fi
+# Users need a documented way out.
+grep -Fq 'npx skills remove' "$repo_root/README.md" \
+  || { echo "README.md must document how to uninstall the skills." >&2; exit 1; }
+grep -Fq -- 'install-commands.sh --uninstall' "$repo_root/README.md" \
+  || { echo "README.md must document removing the command files." >&2; exit 1; }
+
 # --- The bug this repository has already shipped once ------------------------
 # Every `quarto use template` / `quarto add` invocation must carry --no-prompt.
 # Without it Quarto waits on an interactive trust confirmation and a

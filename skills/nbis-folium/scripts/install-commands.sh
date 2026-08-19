@@ -43,8 +43,19 @@ while [ $# -gt 0 ]; do
 done
 
 skill_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-src="$skill_dir/commands"
-test -d "$src" || { echo "missing $src" >&2; exit 1; }
+# The two wrappers are themselves skills, installed alongside this one. Agents
+# that expose skills as slash commands already show /folium-site and
+# /folium-page, so this script is only for agents that need real command files.
+# Reading their SKILL.md directly keeps a single source of truth.
+src=$(dirname -- "$skill_dir")
+for name in folium-site folium-page; do
+  if [ ! -f "$src/$name/SKILL.md" ]; then
+    echo "Cannot find the $name skill next to this one ($src/$name/SKILL.md)." >&2
+    echo "Install the whole package so all three skills are present:" >&2
+    echo "  npx skills add pyrevo/nbis-folium-skill --skill '*'" >&2
+    exit 1
+  fi
+done
 
 wants() {
   [ -z "$agents" ] && return 0
@@ -71,8 +82,8 @@ install_into() {
     return 0
   fi
   mkdir -p "$dest"
-  for f in "$src"/folium-site.md "$src"/folium-page.md; do
-    cp "$f" "$dest/"
+  for name in folium-site folium-page; do
+    cp "$src/$name/SKILL.md" "$dest/$name.md"
   done
   echo "installed /folium-site and /folium-page into $dest"
   installed=$((installed + 1))
@@ -91,8 +102,8 @@ if [ "$installed" -eq 0 ]; then
   echo ""
   echo "No agent directories found, so nothing was installed."
   echo "Copy the two files yourself to wherever your agent keeps commands:"
-  echo "  $src/folium-site.md"
-  echo "  $src/folium-page.md"
+  echo "  $src/folium-site/SKILL.md  -> folium-site.md"
+  echo "  $src/folium-page/SKILL.md  -> folium-page.md"
   exit 1
 fi
 

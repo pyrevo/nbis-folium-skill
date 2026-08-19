@@ -14,7 +14,8 @@ workflow="$skill_dir/templates/deploy-pages.yml"
 logo="$skill_dir/templates/include_logo.html"
 scaffold="$skill_dir/scripts/scaffold.sh"
 install_commands="$skill_dir/scripts/install-commands.sh"
-commands_dir="$skill_dir/commands"
+site_skill="$repo_root/skills/folium-site/SKILL.md"
+page_skill="$repo_root/skills/folium-page/SKILL.md"
 example="$repo_root/example"
 multi_example="$repo_root/example-folium"
 
@@ -31,8 +32,8 @@ test -f "$multi_example/assets/logos/nbis-scilifelab.webp"
 # `npx skills add`, which copies only skills/nbis-folium/.
 test -x "$scaffold" || { echo "not executable: $scaffold" >&2; exit 1; }
 test -x "$install_commands" || { echo "not executable: $install_commands" >&2; exit 1; }
-test -f "$commands_dir/folium-site.md"
-test -f "$commands_dir/folium-page.md"
+test -f "$site_skill"
+test -f "$page_skill"
 
 sh -n "$scaffold"
 sh -n "$install_commands"
@@ -83,14 +84,31 @@ grep -Fq 'scripts/scaffold.sh' "$skill_dir/SKILL.md"
 # The title/subtitle distinction is easy to "simplify" away and silently wrong.
 grep -Fq 'subtitle' "$skill_dir/SKILL.md"
 
-# --- Command wrappers -------------------------------------------------------
-# Each wrapper must preselect exactly one template and defer to the skill, so
-# the procedure is never duplicated into them.
-grep -Fq 'folium-webpage' "$commands_dir/folium-page.md"
-grep -Fq 'nbis-folium' "$commands_dir/folium-page.md"
-grep -Fq 'nbis-folium' "$commands_dir/folium-site.md"
-if grep -Fq 'folium-webpage' "$commands_dir/folium-site.md"; then
-  echo "folium-site.md must not select the folium-webpage template." >&2
+# --- Wrapper skills ---------------------------------------------------------
+# folium-site and folium-page are thin skills so that agents exposing skills as
+# slash commands give /folium-site and /folium-page with no extra install step.
+# Each must preselect exactly one template and defer to nbis-folium, so the
+# procedure is never duplicated into them.
+for wrapper in "$site_skill" "$page_skill"; do
+  # skills.sh reads the name from frontmatter; it must match the directory or
+  # the slash command comes out under the wrong name.
+  expected=$(basename "$(dirname "$wrapper")")
+  grep -Fq "name: $expected" "$wrapper" \
+    || { echo "$wrapper must declare 'name: $expected'." >&2; exit 1; }
+  # The Python-folium collision matters most for description matching.
+  grep -Fq 'Python `folium`' "$wrapper" \
+    || { echo "$wrapper must keep the Python folium negative trigger." >&2; exit 1; }
+  grep -Fq 'nbis-folium' "$wrapper" \
+    || { echo "$wrapper must defer to the nbis-folium skill." >&2; exit 1; }
+  # A wrapper that inlines the procedure defeats the point.
+  if grep -Fq 'quarto use template' "$wrapper"; then
+    echo "$wrapper must not inline the scaffold procedure." >&2
+    exit 1
+  fi
+done
+grep -Fq 'folium-webpage' "$page_skill"
+if grep -Fq -- '--template folium-webpage' "$site_skill"; then
+  echo "folium-site must not select the folium-webpage template." >&2
   exit 1
 fi
 

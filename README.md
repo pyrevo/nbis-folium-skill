@@ -78,29 +78,38 @@ directory), run:
 npx skills add pyrevo/nbis-folium-skill
 ```
 
-Then install the two slash commands. Skills are portable but slash commands are
-not — every agent keeps them somewhere different — so a small script places them
-for whichever agents you have:
+That installs three skills, and on any agent that exposes skills as slash
+commands you immediately have `/folium-site` and `/folium-page`. No second step:
+
+| Skill | Purpose |
+| --- | --- |
+| `nbis-folium` | The whole procedure, plus the scaffold script and templates |
+| `folium-site` | Thin wrapper: preselects the multi-page template |
+| `folium-page` | Thin wrapper: preselects the single-page template |
+
+Install just one with `--skill nbis-folium`, or be explicit with `--skill '*'`.
+
+### Agents without skill-backed slash commands
+
+Some agents read commands from their own directory rather than exposing skills
+that way. For those, a script copies the two wrappers into place:
 
 ```bash
 skills/nbis-folium/scripts/install-commands.sh          # or --dry-run first
 ```
 
 It writes to `~/.claude/commands`, `~/.config/opencode/command`, and
-`~/.codex/prompts`, skipping any agent that isn't installed. Use
-`--scope project` to install into the current project instead. Reload your agent
-afterwards.
+`~/.codex/prompts`, skipping any agent that isn't installed, and reads the
+wrapper skills directly so there is only ever one copy of their text. Use
+`--scope project` for the current project instead.
 
-Without the commands the skill still works — just ask for "a new NBIS folium
-report" and description-matching will find it. The commands exist so you don't
-have to remember a phrasing.
+Either way the skill also works with no commands at all — just ask for "a new
+NBIS folium report" and description-matching will find it.
 
 ### Manual install
 
-If your agent doesn't support the install command, copy the folder
-`skills/nbis-folium/` into your agent's skills directory (for example
-`~/.config/opencode/skills/nbis-folium/`), then copy
-`skills/nbis-folium/commands/*.md` into wherever it keeps slash commands.
+Copy the three folders under `skills/` into your agent's skills directory (for
+example `~/.config/opencode/skills/`).
 
 ## Requirements
 
